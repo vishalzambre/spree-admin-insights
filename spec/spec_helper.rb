@@ -91,4 +91,6 @@ RSpec.configure do |config|
 
   config.fail_fast = ENV['FAIL_FAST'] || false
   config.order = "random"
+  config.include Spree::TestingSupport::ControllerRequests, type: :controller
+  config.infer_spec_type_from_file_location!
 end
