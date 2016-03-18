@@ -48,7 +48,7 @@ describe Spree::CheckoutController do
         send_request('cart')
       end
 
-      it 'create a checkout event record' do
+      it 'doesnt create a checkout event record' do
         expect(controller).not_to receive(:track_activity)
       end
 
