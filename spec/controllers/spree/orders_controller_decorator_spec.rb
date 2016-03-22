@@ -6,7 +6,7 @@ describe Spree::OrdersController do
   let(:user) { mock_model(Spree::User, store_credits_total: 500) }
   let(:checkout_event) { mock_model(Spree::CheckoutEvent) }
 
-  before(:each) do
+  before do
     allow(user).to receive(:orders).and_return(Spree::Order.all)
     allow(controller).to receive(:track_activity).and_return(checkout_event)
     allow(controller).to receive(:check_authorization).and_return(true)
@@ -25,12 +25,11 @@ describe Spree::OrdersController do
     describe 'when return to cart' do
 
       context 'when return from a checkout step' do
-        before(:each) do
+        before do
           @checkout_steps = double('checkout_steps')
           allow(order).to receive(:checkout_steps).and_return(@checkout_steps)
           allow(@checkout_steps).to receive(:include?).and_return(true)
           request.env['HTTP_REFERER'] = 'test/address'
-          send_request
         end
 
         describe 'expects to receive' do
@@ -48,48 +47,52 @@ describe Spree::OrdersController do
         end
 
         describe 'response' do
+          before { send_request }
           it { expect(response).to have_http_status(200) }
         end
 
         describe 'assigns' do
+          before { send_request }
           it { expect(controller.track_activity).to be_instance_of(Spree::CheckoutEvent) }
         end
 
       end
 
       context 'when a product is added' do
-        before(:each) do
+        before do
           checkout_steps = double('checkout_steps')
           allow(order).to receive(:checkout_steps).and_return(checkout_steps)
           allow(checkout_steps).to receive(:include?).and_return(false)
           request.env['HTTP_REFERER'] = 'test/my_test_product'
-          send_request
         end
 
         describe 'response' do
+          before { send_request }
           it { expect(response).to have_http_status(200) }
         end
 
         describe 'assigns' do
+          before { send_request }
           it { expect(controller.track_activity).to be_instance_of(Spree::CheckoutEvent) }
         end
       end
 
       context 'when return to cart from cart itself' do
-        before(:each) do
+        before do
           checkout_steps = double('checkout_steps')
           allow(order).to receive(:checkout_steps).and_return(checkout_steps)
           allow(checkout_steps).to receive(:include?).and_return(true)
           request.env['HTTP_REFERER'] = 'test/cart'
-          send_request
         end
 
         describe 'response' do
+          before { send_request }
           it { expect(response).to have_http_status(200) }
         end
 
         describe 'expect to not receive' do
           it { expect(controller).not_to receive(:track_activity) }
+          after { send_request }
         end
       end
 
@@ -104,7 +107,6 @@ describe Spree::OrdersController do
     before do
       allow(order).to receive(:empty!)
       request.env['HTTP_REFERER'] = 'test/cart'
-      send_request
     end
 
     describe 'expects to receive' do
@@ -121,10 +123,12 @@ describe Spree::OrdersController do
 
 
     describe 'assigns' do
+      before { send_request }
       it { expect(controller.track_activity).to be_instance_of(Spree::CheckoutEvent) }
     end
 
     describe 'response' do
+      before { send_request }
       it { expect(response).to have_http_status(302) }
     end
   end

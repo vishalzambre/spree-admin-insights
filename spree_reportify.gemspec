@@ -35,5 +35,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'shoulda-matchers', '~> 2.6.2'
   s.add_development_dependency 'spree_backend', spree_version
   s.add_development_dependency 'spree_frontend', spree_version
-  s.add_development_dependency 'rspec-activemodel-mocks'
+  s.add_development_dependency 'rspec-activemodel-mocks', '~> 1.0.3'
 end

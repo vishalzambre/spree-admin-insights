@@ -6,7 +6,7 @@ describe Spree::CheckoutController do
   let(:user) { mock_model(Spree::User, store_credits_total: 500) }
   let(:checkout_event) { mock_model(Spree::CheckoutEvent) }
 
-  before(:each) do
+  before do
     allow(user).to receive(:orders).and_return(Spree::Order.all)
     allow(controller).to receive(:track_activity).and_return(checkout_event)
     allow(controller).to receive(:ensure_order_not_completed).and_return(true)
@@ -27,7 +27,7 @@ describe Spree::CheckoutController do
       get :edit, state: state
     end
 
-    before(:each) do
+    before do
       allow(order).to receive(:state=).and_return("address")
     end
 
@@ -64,17 +64,16 @@ describe Spree::CheckoutController do
     end
 
     context 'when previous state is same as next state' do
-      before do
-        request.env['HTTP_REFERER'] = 'test/cart'
-        send_request('cart')
-      end
+      before { request.env['HTTP_REFERER'] = 'test/cart' }
 
       describe 'response' do
+        before { send_request('cart') }
         it { expect(response).to have_http_status(200) }
       end
 
       describe 'expect not to receive' do
         it { expect(controller).not_to receive(:track_activity) }
+        after { send_request('cart') }
       end
     end
 
@@ -86,14 +85,13 @@ describe Spree::CheckoutController do
       patch :update, state: order.state
     end
 
-    before(:each) do
+    before do
       allow(order).to receive(:update_from_params).and_return(true)
       allow(order).to receive(:temporary_address=).and_return(true)
       allow(order).to receive(:state=).and_return("complete")
       allow(order).to receive(:next).and_return(true)
       allow(order).to receive(:completed?).and_return(true)
       request.env['HTTP_REFERER'] = 'test/confirm'
-      send_request
     end
 
     describe 'expects to receive' do
@@ -119,10 +117,12 @@ describe Spree::CheckoutController do
     end
 
     describe 'assigns' do
+      before { send_request }
       it { expect(controller.track_activity).to be_instance_of(Spree::CheckoutEvent) }
     end
 
     describe 'response' do
+      before { send_request }
       it { expect(response).to have_http_status(302) }
     end
 
