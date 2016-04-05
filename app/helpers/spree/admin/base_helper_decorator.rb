@@ -14,5 +14,4 @@ Spree::BaseHelper.class_eval do
   def pdf_logo(image_path = Spree::Config[:logo])
     wicked_pdf_image_tag image_path, class: 'logo'
   end
-
 end
