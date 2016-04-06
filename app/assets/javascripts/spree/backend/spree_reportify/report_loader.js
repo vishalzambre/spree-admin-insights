@@ -80,6 +80,15 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
   });
 }
 
+ReportLoader.prototype.buidChart = function(data) {
+  if(data['chart_json']['chart']) {
+    $('#chart-container').removeClass('hidden');
+    $('#chart-container').highcharts(data['chart_json']['json']);
+  } else {
+    $('#chart-container').addClass('hidden');
+  }
+}
+
 ReportLoader.prototype.fetchChartDataWithoutState = function(url, $selectedOption) {
   this.isStatePushable = false;
   this.fetchChartData(url, $selectedOption);
@@ -89,10 +98,12 @@ ReportLoader.prototype.populateInsightsData = function(data) {
   if(data.headers != undefined) {
     var $templateData = $(tmpl('tmpl', data));
     this.$insightsTableList.empty().append($templateData);
+    this.buidChart(data);
   } else {
       $('#report-div').empty();
       $('#paginator-div').empty();
       $('#search-div').addClass('hide');
+      $('#chart-container').addClass('hidden');
   }
   if(this.isStatePushable) {
     this.pushUrlToHistory();
