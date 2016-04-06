@@ -13,19 +13,20 @@ function ReportLoader(inputs) {
   this.removePaginationButton = inputs.removePaginationButton;
   this.applyPaginationButton = inputs.applyPaginationButton;
   this.downloadLinks = inputs.downloadLinks;
+  this.chartContainer = inputs.chartContainer;
   this.requestUrl = '';
   this.isStatePushable = true;
   this.tableSorterObject = null;
   this.searcherObject = null;
   this.paginatorObject = null;
-};
+}
 
 ReportLoader.prototype.init = function() {
   var tableSorterInputs = {
     $insightsTable: this.$insightsTableList,
     reportLoader: this,
     paginatorDiv: this.paginatorDiv
-  }
+  };
   this.tableSorterObject = new TableSorter(tableSorterInputs);
   this.tableSorterObject.bindEvents();
 
@@ -46,7 +47,7 @@ ReportLoader.prototype.init = function() {
   };
   this.paginatorObject = new Paginator(paginatorInputs, this);
   this.paginatorObject.bindEvents();
-}
+};
 
 ReportLoader.prototype.bindEvents = function() {
   var _this = this;
@@ -88,12 +89,12 @@ ReportLoader.prototype.refreshPage = function(event) {
 ReportLoader.prototype.bindPopStateEventCallback = function() {
   var _this = this;
   window.onpopstate = function(event) {
-    event.state ? (report_name = event.state['report_name'] || '') : (report_name = '')
+    event.state ? (report_name = event.state['report_name'] || '') : (report_name = '');
     _this.$selectList.val(report_name);
     _this.$selectList.select2('val', report_name);
     var $selectedOption = _this.$selectList.find(':selected');
     _this.fetchChartDataWithoutState(location.href, $selectedOption);
-  }
+  };
 };
 
 ReportLoader.prototype.loadChart = function($selectedOption) {
@@ -109,7 +110,7 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
     url: url,
     dataType: 'json',
     success: function(data) {
-      _this.isStatePushable ? _this.populateInsightsData(data) : _this.populateInsightsDataWithoutState(data);
+      (_this.isStatePushable ? _this.populateInsightsData(data) : _this.populateInsightsDataWithoutState(data));
       if(data.headers != undefined) {
         _this.pageSelector.closest('.hide').removeClass('hide');
         _this.pageSelector.data('url', data['request_path'] + '?type=' + data['report_type']);
@@ -121,21 +122,32 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
       }
     }
   });
-}
+};
+
+ReportLoader.prototype.buidChart = function(data) {
+  if(data['chart_json']['chart']) {
+    $('#chart-container').removeClass('hidden');
+    $('#chart-container').highcharts(data['chart_json']['json']);
+  } else {
+    $('#chart-container').addClass('hidden');
+  }
+};
 
 ReportLoader.prototype.fetchChartDataWithoutState = function(url, $selectedOption) {
   this.isStatePushable = false;
   this.fetchChartData(url, $selectedOption);
-}
+};
 
 ReportLoader.prototype.populateInsightsData = function(data) {
   if(data.headers != undefined) {
     var $templateData = $(tmpl('tmpl', data));
     this.$insightsTableList.empty().append($templateData);
+    this.buidChart(data);
   } else {
-      this.$insightsTableList.empty();
-      this.paginatorDiv.empty();
-      this.filterDiv.addClass('hide');
+    this.$insightsTableList.empty();
+    this.paginatorDiv.empty();
+    this.filterDiv.addClass('hide');
+    this.chartContainer.addClass('hidden');
   }
   if(this.isStatePushable) {
     this.pushUrlToHistory();
@@ -154,10 +166,10 @@ ReportLoader.prototype.setDownloadLinksPath = function($selectedOption) {
 ReportLoader.prototype.populateInsightsDataWithoutState = function(data) {
   this.isStatePushable = false;
   this.populateInsightsData(data);
-}
+};
 
 ReportLoader.prototype.pushUrlToHistory = function() {
-  var report_name = this.$selectList.find(':selected').val()
+  var report_name = this.$selectList.find(':selected').val();
   window.history.pushState({ report_name: report_name }, '', this.requestUrl);
   this.requestUrl = '';
 };
@@ -178,7 +190,8 @@ $(function() {
     pageSelector: $('#per_page'),
     filterDiv: $('#search-div'),
     paginatorDiv: $('#paginator-div'),
-    downloadLinks: $('.download-link')
+    downloadLinks: $('.download-link'),
+    chartContainer: $('#chart-container')
   },
     reportLoader = new ReportLoader(inputs);
   reportLoader.init();
