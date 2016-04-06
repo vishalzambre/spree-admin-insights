@@ -9,8 +9,9 @@ TableSorter.prototype.bindEvents = function() {
   var _this = this;
   this.$insightsTableList.on('click', '#admin-insight .sortable-link', function() {
     event.preventDefault();
-    var currentPage = $('#paginator-div li.active a').html() - 1
-    var requestPath = $(event.target).attr('href') + '&' + $('#filter-search').serialize() + '&page=' + currentPage + "&per_page=" + _this.reportLoader.pageSelector.find(':selected').attr('value');
+    var currentPage = $('#paginator-div li.active a').html() - 1,
+      noPagination = _this.reportLoader.paginatorObject.removePaginationButton.closest('span').hasClass('hide'),
+      requestPath = $(event.target).attr('href') + '&' + $('#filter-search').serialize() + '&page=' + currentPage + "&per_page=" + _this.reportLoader.pageSelector.find(':selected').attr('value') + '&no_pagination=' + noPagination;
     _this.reportLoader.requestUrl = requestPath;
 
     $.ajax({
