@@ -1,16 +1,18 @@
 //= require spree/backend/jquery.tablesorter.min
 
-function TableSorter($insightsTable, reportLoader) {
-  this.$insightsTableList = $insightsTable;
-  this.reportLoader = reportLoader;
+function TableSorter(inputs) {
+  this.$insightsTableList = inputs.$insightsTable;
+  this.reportLoader = inputs.reportLoader;
+  this.paginatorDiv = inputs.paginatorDiv;
 }
 
 TableSorter.prototype.bindEvents = function() {
   var _this = this;
   this.$insightsTableList.on('click', '#admin-insight .sortable-link', function() {
     event.preventDefault();
-    var currentPage = $('#paginator-div li.active a').html() - 1
-    var requestPath = $(event.target).attr('href') + '&' + $('#filter-search').serialize() + '&page=' + currentPage + "&per_page=" + _this.reportLoader.pageSelector.find(':selected').attr('value');
+    var currentPage = _this.paginatorDiv.find('li.active a').html() - 1,
+      noPagination = _this.reportLoader.removePaginationButton.closest('span').hasClass('hide'),
+      requestPath = $(event.target).attr('href') + '&' + $('#filter-search').serialize() + '&page=' + currentPage + "&per_page=" + _this.reportLoader.pageSelector.find(':selected').attr('value') + '&no_pagination=' + noPagination;
     _this.reportLoader.requestUrl = requestPath;
 
     $.ajax({
@@ -41,5 +43,5 @@ TableSorter.prototype.fetchSortedAttribute = function() {
 };
 
 TableSorter.prototype.getSortedAttribute = function(order) {
-  return this.$insightsTableList.find(`.${order}`).html().toLowerCase().split(' ').join('_');
+  return this.$insightsTableList.find(`.${order}`).data('attribute');
 };

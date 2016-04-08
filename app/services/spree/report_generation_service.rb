@@ -7,7 +7,7 @@ module Spree
                                     :cart_additions, :cart_removals, :cart_updations,
                                     :product_views, :product_views_to_cart_additions,
                                     :product_views_to_purchases, :unique_purchases,
-                                    :best_selling_products
+                                    :best_selling_products, :returned_products
                                   ],
       promotion_analysis:         [:promotional_cost],
       sales_performance_analysis: [:sales_performance],
@@ -21,7 +21,7 @@ module Spree
       dataset = resource.generate
       total_records = resource.select_columns(dataset).count
       result_set = resource.select_columns(dataset.limit(options['records_per_page'], options['offset'])).all
-      [headers(klass, resource), result_set, total_pages(total_records, options['records_per_page']), search_attributes(klass), resource.chart_json]
+      [headers(klass, resource, report_name), result_set, total_pages(total_records, options['records_per_page'], options['no_pagination']), search_attributes(klass), resource.chart_json]
     end
 
     def self.search_attributes(klass)
@@ -32,20 +32,24 @@ module Spree
       search_attributes
     end
 
-    def self.total_pages(total_records, records_per_page)
-      total_pages = total_records / records_per_page
-      if total_records % records_per_page == 0
-        total_pages -= 1
+    def self.total_pages(total_records, records_per_page, no_pagination)
+      if no_pagination != 'true'
+        total_pages = total_records / records_per_page
+        if total_records % records_per_page == 0
+          total_pages -= 1
+        end
+        total_pages
       end
-      total_pages
     end
 
-    def self.headers(klass, resource)
-      klass::HEADERS.map do |header|
+    def self.headers(klass, resource, report_name)
+      klass::HEADERS.keys.map do |header|
         {
-          name: header.to_s.humanize,
+          name: Spree.t(header.to_sym, scope: [:insight, report_name]),
           value: header,
-          sorted: resource.try(:header_sorted?, header) ? resource.sortable_type.to_s : nil
+          sorted: resource.try(:header_sorted?, header) ? resource.sortable_type.to_s : nil,
+          type: klass::HEADERS[header],
+          sortable: header.in?(klass::SORTABLE_ATTRIBUTES)
         }
       end
     end

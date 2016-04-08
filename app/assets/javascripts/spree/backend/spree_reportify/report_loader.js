@@ -5,19 +5,31 @@
 function ReportLoader(inputs) {
   this.$selectList = inputs.reportsSelectBox;
   this.$insightsTableList = inputs.insightsDiv;
+  this.pageSelector = inputs.pageSelector;
+  this.resetButton = inputs.resetButton;
+  this.refreshButton = inputs.refreshButton;
+  this.filterDiv = inputs.filterDiv;
+  this.paginatorDiv = inputs.paginatorDiv;
+  this.removePaginationButton = inputs.removePaginationButton;
+  this.applyPaginationButton = inputs.applyPaginationButton;
+  this.chartContainer = inputs.chartContainer;
   this.requestUrl = '';
-  this.pageSelector = $('#per_page');
   this.isStatePushable = true;
   this.tableSorterObject = null;
   this.searcherObject = null;
   this.paginatorObject = null;
-};
+}
 
 ReportLoader.prototype.init = function() {
-  this.tableSorterObject = new TableSorter(this.$insightsTableList, this);
+  var tableSorterInputs = {
+    $insightsTable: this.$insightsTableList,
+    reportLoader: this,
+    paginatorDiv: this.paginatorDiv
+  };
+  this.tableSorterObject = new TableSorter(tableSorterInputs);
   this.tableSorterObject.bindEvents();
   var searcherInputs = {
-    filterDiv:   $('#search-div'),
+    filterDiv:   this.filterDiv,
     insightsDiv: this.$insightsTableList,
     tableSorterObject: this.tableSorterObject
   };
@@ -25,33 +37,62 @@ ReportLoader.prototype.init = function() {
   this.searcherObject.bindEvents();
 
   var paginatorInputs = {
-    paginatorDiv: $('#paginator-div'),
+    paginatorDiv: this.paginatorDiv,
     insightsDiv: this.$insightsTableList,
-    tableSorterObject: this.tableSorterObject
+    tableSorterObject: this.tableSorterObject,
+    removePaginationButton: this.removePaginationButton,
+    applyPaginationButton: this.applyPaginationButton
   };
   this.paginatorObject = new Paginator(paginatorInputs, this);
   this.paginatorObject.bindEvents();
-}
+};
 
 ReportLoader.prototype.bindEvents = function() {
   var _this = this;
   _this.$selectList.on('change', function() {
+    _this.paginatorObject.togglePaginatorButtons(_this.paginatorObject.removePaginationButton, _this.paginatorObject.applyPaginationButton);
     _this.searcherObject.clearSearchFields();
     _this.loadChart($(this).find(':selected'));
+  });
+
+  this.resetButton.on('click', function() {
+    _this.resetFilters(event);
+  });
+
+  this.refreshButton.on('click', function() {
+    _this.refreshPage(event);
   });
 
   _this.bindPopStateEventCallback();
 };
 
+ReportLoader.prototype.resetFilters = function(event) {
+  event.preventDefault();
+  var $element = $(event.target),
+      noPagination = this.removePaginationButton.closest('span').hasClass('hide');
+  $element.attr('href', this.pageSelector.data('url') + '&no_pagination=' + noPagination);
+  $element.data('url', this.pageSelector.data('url') + '&no_pagination=' + noPagination);
+  this.loadChart($element);
+  this.searcherObject.clearSearchFields();
+};
+
+ReportLoader.prototype.refreshPage = function(event) {
+  event.preventDefault();
+  var $element = $(event.target);
+  $element.attr('href', location.href);
+  $element.data('url', location.href);
+  this.loadChart($element);
+};
+
 ReportLoader.prototype.bindPopStateEventCallback = function() {
   var _this = this;
   window.onpopstate = function(event) {
-    event.state ? (report_name = event.state['report_name'] || '') : (report_name = '')
+    event.state ? (report_name = event.state['report_name'] || '') : (report_name = '');
     _this.$selectList.val(report_name);
     _this.$selectList.select2('val', report_name);
     var $selectedOption = _this.$selectList.find(':selected');
     _this.fetchChartDataWithoutState(location.href, $selectedOption);
-  }
+  };
 };
 
 ReportLoader.prototype.loadChart = function($selectedOption) {
@@ -67,9 +108,9 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
     url: url,
     dataType: 'json',
     success: function(data) {
-      _this.isStatePushable ? _this.populateInsightsData(data) : _this.populateInsightsDataWithoutState(data);
+      (_this.isStatePushable ? _this.populateInsightsData(data) : _this.populateInsightsDataWithoutState(data));
       if(data.headers != undefined) {
-        _this.pageSelector.closest('div').removeClass('hide');
+        _this.pageSelector.closest('.hide').removeClass('hide');
         _this.pageSelector.data('url', data['request_path'] + '?type=' + data['report_type']);
         _this.searcherObject.refreshSearcher($selectedOption, data);
         _this.paginatorObject.refreshPaginator(data);
@@ -78,7 +119,21 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
       }
     }
   });
-}
+};
+
+ReportLoader.prototype.buidChart = function(data) {
+  var chart_container = $('#chart-container');
+  if(data['chart_json']['chart']) {
+    chart_container.empty().removeClass('hidden');
+    $.each(data['chart_json']['charts'], function(index, chart) {
+      var chart_div = $('<div>', { id: chart['id'] });
+      chart_container.append(chart_div);
+      chart_div.highcharts(chart['json']);
+    })
+  } else {
+    chart_container.addClass('hidden');
+  }
+};
 
 ReportLoader.prototype.buidChart = function(data) {
   var chart_container = $('#chart-container');
@@ -97,7 +152,7 @@ ReportLoader.prototype.buidChart = function(data) {
 ReportLoader.prototype.fetchChartDataWithoutState = function(url, $selectedOption) {
   this.isStatePushable = false;
   this.fetchChartData(url, $selectedOption);
-}
+};
 
 ReportLoader.prototype.populateInsightsData = function(data) {
   if(data.headers != undefined) {
@@ -105,10 +160,10 @@ ReportLoader.prototype.populateInsightsData = function(data) {
     this.$insightsTableList.empty().append($templateData);
     this.buidChart(data);
   } else {
-      $('#report-div').empty();
-      $('#paginator-div').empty();
-      $('#search-div').addClass('hide');
-      $('#chart-container').addClass('hidden');
+    this.$insightsTableList.empty();
+    this.paginatorDiv.empty();
+    this.filterDiv.addClass('hide');
+    this.chartContainer.addClass('hidden');
   }
   if(this.isStatePushable) {
     this.pushUrlToHistory();
@@ -120,10 +175,10 @@ ReportLoader.prototype.populateInsightsData = function(data) {
 ReportLoader.prototype.populateInsightsDataWithoutState = function(data) {
   this.isStatePushable = false;
   this.populateInsightsData(data);
-}
+};
 
 ReportLoader.prototype.pushUrlToHistory = function() {
-  var report_name = this.$selectList.find(':selected').val()
+  var report_name = this.$selectList.find(':selected').val();
   window.history.pushState({ report_name: report_name }, '', this.requestUrl);
   this.requestUrl = '';
 };
@@ -136,10 +191,18 @@ ReportLoader.prototype.populateInitialData = function() {
 $(function() {
   var inputs = {
     insightsDiv:      $('#report-div'),
-    reportsSelectBox: $('#reports')
+    reportsSelectBox: $('#reports'),
+    resetButton: $('#reset'),
+    refreshButton: $('#refresh'),
+    removePaginationButton: $('#remove-pagination'),
+    applyPaginationButton: $('#apply-pagination'),
+    pageSelector: $('#per_page'),
+    filterDiv: $('#search-div'),
+    paginatorDiv: $('#paginator-div'),
+    chartContainer: $('#chart-container')
   },
-    report_loader = new ReportLoader(inputs);
-  report_loader.init();
-  report_loader.bindEvents();
-  report_loader.populateInitialData();
+    reportLoader = new ReportLoader(inputs);
+  reportLoader.init();
+  reportLoader.bindEvents();
+  reportLoader.populateInitialData();
 });
