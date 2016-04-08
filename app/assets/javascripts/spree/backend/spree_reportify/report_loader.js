@@ -12,6 +12,7 @@ function ReportLoader(inputs) {
   this.paginatorDiv = inputs.paginatorDiv;
   this.removePaginationButton = inputs.removePaginationButton;
   this.applyPaginationButton = inputs.applyPaginationButton;
+  this.downloadLinks = inputs.downloadLinks;
   this.requestUrl = '';
   this.isStatePushable = true;
   this.tableSorterObject = null;
@@ -27,6 +28,7 @@ ReportLoader.prototype.init = function() {
   }
   this.tableSorterObject = new TableSorter(tableSorterInputs);
   this.tableSorterObject.bindEvents();
+
   var searcherInputs = {
     filterDiv:   this.filterDiv,
     insightsDiv: this.$insightsTableList,
@@ -111,6 +113,7 @@ ReportLoader.prototype.fetchChartData = function(url, $selectedOption) {
       if(data.headers != undefined) {
         _this.pageSelector.closest('.hide').removeClass('hide');
         _this.pageSelector.data('url', data['request_path'] + '?type=' + data['report_type']);
+        _this.setDownloadLinksPath();
         _this.searcherObject.refreshSearcher($selectedOption, data);
         _this.paginatorObject.refreshPaginator(data);
         if(data.searched_fields != undefined)
@@ -141,6 +144,13 @@ ReportLoader.prototype.populateInsightsData = function(data) {
   }
 };
 
+ReportLoader.prototype.setDownloadLinksPath = function($selectedOption) {
+  var _this = this;
+  $.each(this.downloadLinks, function() {
+    $(this).attr('href', $(this).data('url') + `?id=${ _this.$selectList.val() }&no_pagination=true`);
+  });
+};
+
 ReportLoader.prototype.populateInsightsDataWithoutState = function(data) {
   this.isStatePushable = false;
   this.populateInsightsData(data);
@@ -167,7 +177,8 @@ $(function() {
     applyPaginationButton: $('#apply-pagination'),
     pageSelector: $('#per_page'),
     filterDiv: $('#search-div'),
-    paginatorDiv: $('#paginator-div')
+    paginatorDiv: $('#paginator-div'),
+    downloadLinks: $('.download-link')
   },
     reportLoader = new ReportLoader(inputs);
   reportLoader.init();

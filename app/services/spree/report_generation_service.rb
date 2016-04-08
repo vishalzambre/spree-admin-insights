@@ -33,6 +33,15 @@ module Spree
       end
     end
 
+    def self.download(options = {}, headers, stats)
+      ::CSV.generate(options) do |csv|
+        csv << headers.map { |head| head[:name] }
+        stats.each do |record|
+          csv << record.values
+        end
+      end
+    end
+
     def self.search_attributes(klass)
       search_attributes = {}
       klass::SEARCH_ATTRIBUTES.each do |key, value|
