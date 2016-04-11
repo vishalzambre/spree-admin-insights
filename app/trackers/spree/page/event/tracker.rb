@@ -2,7 +2,7 @@ module Spree
   module Page
     module Event
       class Tracker < Spree::Event::Tracker
-        EVENTS = { show: :view, search: :search, filter: :filter }
+        EVENTS = { show: :view, search: :search, filter: :filter, index: :index }
 
         def initialize(arguments = {})
           super(arguments)

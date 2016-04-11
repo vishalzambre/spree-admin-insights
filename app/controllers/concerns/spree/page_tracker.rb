@@ -24,7 +24,11 @@ module Spree
 
     def get_activity
       if index_action?
-        Spree::Page::Event::Tracker::EVENTS[:search]
+        if @searcher && (@searcher.keywords || @searcher.search)
+          Spree::Page::Event::Tracker::EVENTS[:search]
+        else
+          Spree::Page::Event::Tracker::EVENTS[:index]
+        end
       elsif show_action?
         if @searcher && @searcher.search
           Spree::Page::Event::Tracker::EVENTS[:filter]
@@ -39,7 +43,7 @@ module Spree
     end
 
     def event_trackable?
-      show_action? || (index_action? && @searcher && (@searcher.keywords || @searcher.search))
+      show_action? || index_action?
     end
 
     %w(index show).each do |_action_|
