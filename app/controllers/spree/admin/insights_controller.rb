@@ -39,7 +39,6 @@ module Spree
 
       def download
         @headers, @stats = ReportGenerationService.generate_report(@report_name, params.merge(@pagination_hash))
-
         respond_to do |format|
           format.csv do
             send_data ReportGenerationService.download(@headers, @stats),

@@ -3,22 +3,22 @@
 //= require spree/backend/spree_reportify/table_sorter
 
 function ReportLoader(inputs) {
-  this.$selectList = inputs.reportsSelectBox;
-  this.$insightsTableList = inputs.insightsDiv;
-  this.pageSelector = inputs.pageSelector;
-  this.resetButton = inputs.resetButton;
-  this.refreshButton = inputs.refreshButton;
-  this.filterDiv = inputs.filterDiv;
-  this.paginatorDiv = inputs.paginatorDiv;
+  this.$selectList            = inputs.reportsSelectBox;
+  this.$insightsTableList     = inputs.insightsDiv;
+  this.pageSelector           = inputs.pageSelector;
+  this.resetButton            = inputs.resetButton;
+  this.refreshButton          = inputs.refreshButton;
+  this.filterDiv              = inputs.filterDiv;
+  this.paginatorDiv           = inputs.paginatorDiv;
   this.removePaginationButton = inputs.removePaginationButton;
-  this.applyPaginationButton = inputs.applyPaginationButton;
-  this.downloadLinks = inputs.downloadLinks;
-  this.chartContainer = inputs.chartContainer;
-  this.requestUrl = '';
-  this.isStatePushable = true;
-  this.tableSorterObject = null;
-  this.searcherObject = null;
-  this.paginatorObject = null;
+  this.applyPaginationButton  = inputs.applyPaginationButton;
+  this.downloadLinks          = inputs.downloadLinks;
+  this.chartContainer         = inputs.chartContainer;
+  this.requestUrl             = '';
+  this.isStatePushable        = true;
+  this.tableSorterObject      = null;
+  this.searcherObject         = null;
+  this.paginatorObject        = null;
 }
 
 ReportLoader.prototype.init = function() {
@@ -31,19 +31,19 @@ ReportLoader.prototype.init = function() {
   this.tableSorterObject.bindEvents();
 
   var searcherInputs = {
-    filterDiv:   this.filterDiv,
-    insightsDiv: this.$insightsTableList,
+    filterDiv:         this.filterDiv,
+    insightsDiv:       this.$insightsTableList,
     tableSorterObject: this.tableSorterObject
   };
   this.searcherObject = new Searcher(searcherInputs, this);
   this.searcherObject.bindEvents();
 
   var paginatorInputs = {
-    paginatorDiv: this.paginatorDiv,
-    insightsDiv: this.$insightsTableList,
-    tableSorterObject: this.tableSorterObject,
+    paginatorDiv:           this.paginatorDiv,
+    insightsDiv:            this.$insightsTableList,
+    tableSorterObject:      this.tableSorterObject,
     removePaginationButton: this.removePaginationButton,
-    applyPaginationButton: this.applyPaginationButton
+    applyPaginationButton:  this.applyPaginationButton
   };
   this.paginatorObject = new Paginator(paginatorInputs, this);
   this.paginatorObject.bindEvents();
@@ -72,8 +72,7 @@ ReportLoader.prototype.resetFilters = function(event) {
   event.preventDefault();
   var $element = $(event.target),
       noPagination = this.removePaginationButton.closest('span').hasClass('hide');
-  $element.attr('href', this.pageSelector.data('url') + '&no_pagination=' + noPagination);
-  $element.data('url', this.pageSelector.data('url') + '&no_pagination=' + noPagination);
+  this.setPath($element, (this.pageSelector.data('url') + '&no_pagination=' + noPagination));
   this.loadChart($element);
   this.searcherObject.clearSearchFields();
 };
@@ -81,8 +80,7 @@ ReportLoader.prototype.resetFilters = function(event) {
 ReportLoader.prototype.refreshPage = function(event) {
   event.preventDefault();
   var $element = $(event.target);
-  $element.attr('href', location.href);
-  $element.data('url', location.href);
+  this.setPath($element, location.href);
   this.loadChart($element);
 };
 
@@ -184,19 +182,24 @@ ReportLoader.prototype.populateInitialData = function() {
   this.fetchChartDataWithoutState(location.href, $selectedOption);
 };
 
+ReportLoader.prototype.setPath = function($element, path) {
+  $element.attr('href', path);
+  $element.data('url', path);
+};
+
 $(function() {
   var inputs = {
-    insightsDiv:      $('#report-div'),
-    reportsSelectBox: $('#reports'),
-    resetButton: $('#reset'),
-    refreshButton: $('#refresh'),
+    insightsDiv:            $('#report-div'),
+    reportsSelectBox:       $('#reports'),
+    resetButton:            $('#reset'),
+    refreshButton:          $('#refresh'),
     removePaginationButton: $('#remove-pagination'),
-    applyPaginationButton: $('#apply-pagination'),
-    pageSelector: $('#per_page'),
-    filterDiv: $('#search-div'),
-    paginatorDiv: $('#paginator-div'),
-    downloadLinks: $('.download-link'),
-    chartContainer: $('#chart-container')
+    applyPaginationButton:  $('#apply-pagination'),
+    pageSelector:           $('#per_page'),
+    filterDiv:              $('#search-div'),
+    paginatorDiv:           $('#paginator-div'),
+    downloadLinks:          $('.download-link'),
+    chartContainer:         $('#chart-container')
   },
     reportLoader = new ReportLoader(inputs);
   reportLoader.init();

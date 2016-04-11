@@ -45,9 +45,7 @@ Paginator.prototype.refreshPaginator = function(data) {
 Paginator.prototype.loadPaginationData = function (event) {
   var $element = $(event.target),
     sorted_attributes = this.tableSorter.fetchSortedAttribute(),
-    attribute = sorted_attributes[0],
-    sortOrder = sorted_attributes[1],
-    requestPath = `${$element.attr('href')}&sort%5Battribute%5D=${attribute}&sort%5Btype%5D=${sortOrder}`,
+    requestPath = `${$element.attr('href')}&sort%5Battribute%5D=${sorted_attributes[0]}&sort%5Btype%5D=${sorted_attributes[1]}`,
     _this = this;
   _this.reportLoader.requestUrl = requestPath;
 
@@ -78,9 +76,7 @@ Paginator.prototype.populatePaginationData = function(data) {
 Paginator.prototype.loadReportData = function(event) {
   var $element = $(event.target),
       sorted_attributes = this.tableSorter.fetchSortedAttribute(),
-      attribute = sorted_attributes[0],
-      sortOrder = sorted_attributes[1],
-      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${attribute}&sort%5Btype%5D=${sortOrder}&${$('#filter-search').serialize()}&per_page=${$element.val()}`;
+      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${sorted_attributes[0]}&sort%5Btype%5D=${sorted_attributes[1]}&${$('#filter-search').serialize()}&per_page=${$element.val()}`;
   $element.data('url', requestUrl);
   this.reportLoader.loadChart($element);
 };
@@ -89,9 +85,7 @@ Paginator.prototype.removePagination = function(currentElement) {
   var $element = this.reportLoader.pageSelector,
       _this = this,
       sorted_attributes = this.tableSorter.fetchSortedAttribute(),
-      attribute = sorted_attributes[0],
-      sortOrder = sorted_attributes[1],
-      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${attribute}&sort%5Btype%5D=${sortOrder}&${$('#filter-search').serialize()}&no_pagination=true`;
+      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${sorted_attributes[0]}&sort%5Btype%5D=${sorted_attributes[1]}&${$('#filter-search').serialize()}&no_pagination=true`;
   $(currentElement).attr('href', requestUrl);
   _this.reportLoader.requestUrl = requestUrl;
   $element.val('');
@@ -110,9 +104,7 @@ Paginator.prototype.applyPagination = function(currentElement) {
   var $element = this.reportLoader.pageSelector,
       _this = this,
       sorted_attributes = this.tableSorter.fetchSortedAttribute(),
-      attribute = sorted_attributes[0],
-      sortOrder = sorted_attributes[1],
-      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${attribute}&sort%5Btype%5D=${sortOrder}&${$('#filter-search').serialize()}`;
+      requestUrl = `${$element.data('url')}&sort%5Battribute%5D=${sorted_attributes[0]}&sort%5Btype%5D=${sorted_attributes[1]}&${$('#filter-search').serialize()}`;
   $(currentElement).attr('href', requestUrl);
   _this.reportLoader.requestUrl = requestUrl;
   $element.val('5');
