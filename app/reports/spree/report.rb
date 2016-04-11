@@ -33,6 +33,7 @@ module Spree
 
     def initialize_months_table
       unless SpreeReportify::ReportDb.table_exists?(:months)
+        # TODO_JS To be checked again
         SpreeReportify::ReportDb.create_table :months do
           column :name, :text
           column :number, :integer
@@ -40,7 +41,7 @@ module Spree
         months_table = SpreeReportify::ReportDb[:months]
         month_names = Date::MONTHNAMES.dup
         month_names.shift(1)
-        month_names.each_with_index { |month_name, index| months_table.insert(name: month_name, number: index) }
+        month_names.each_with_index { |month_name, index| months_table.insert(name: month_name, number: (index + 1)) }
       end
     end
 
