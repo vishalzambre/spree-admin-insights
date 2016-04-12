@@ -11,8 +11,7 @@ Spree::BaseHelper.class_eval do
     [5, 10, 15, 30, 45, 60]
   end
 
-  def page_selector_options
-    [5, 10, 15, 30, 45, 60]
+  def pdf_logo(image_path = Spree::Config[:logo])
+    wicked_pdf_image_tag image_path, class: 'logo'
   end
-
 end
