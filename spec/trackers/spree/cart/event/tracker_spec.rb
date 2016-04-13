@@ -40,7 +40,7 @@ describe Spree::Cart::Event::Tracker do
     end
 
     it 'should return previous quantity changes' do
-      expect(tracker.changed_quantity(@previous_quantity_changes)).to be_instance_of(Fixnum)
+      expect(tracker.send(:changed_quantity, @previous_quantity_changes)).to be_instance_of(Fixnum)
     end
   end
 
@@ -49,7 +49,7 @@ describe Spree::Cart::Event::Tracker do
       before do
         @changed_quantity = target.quantity
       end
-      it { expect(tracker.activity(@changed_quantity, target)).to eq(:add) }
+      it { expect(tracker.send(:activity, @changed_quantity, target)).to eq(:add) }
     end
 
     context 'when item is removed' do
@@ -58,11 +58,11 @@ describe Spree::Cart::Event::Tracker do
         target.save
         @changed_quantity = -1
       end
-      it { expect(tracker.activity(@changed_quantity, target)).to eq(:remove) }
+      it { expect(tracker.send(:activity, @changed_quantity, target)).to eq(:remove) }
     end
 
     context 'when item is updated' do
-      it { expect(tracker.activity(7, target)).to eq(:update) }
+      it { expect(tracker.send(:activity, 7, target)).to eq(:update) }
     end
 
   end

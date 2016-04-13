@@ -8,7 +8,6 @@ describe Spree::PageEvent do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:referrer) }
     it { is_expected.to validate_presence_of(:session_id) }
     it { is_expected.to validate_presence_of(:activity) }
   end

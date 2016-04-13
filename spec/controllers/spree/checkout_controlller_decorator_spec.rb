@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Spree::CheckoutController do
 
   let(:order) { mock_model(Spree::Order, remaining_total: 1000, state: 'cart') }
-  let(:user) { mock_model(Spree::User, store_credits_total: 500) }
+  let(:user) { mock_model(Spree.user_class, store_credits_total: 500) }
   let(:checkout_event) { mock_model(Spree::CheckoutEvent) }
 
   before do
