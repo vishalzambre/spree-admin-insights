@@ -18,8 +18,8 @@ describe Spree::CartAdditionsReport do
   end
 
   describe '#select_columns' do
-    before { @dataset = report.generate }
-    it { expect(report.select_columns(@dataset)).to be_an_instance_of(Sequel::Mysql2::Dataset) }
+    let(:dataset) { report.generate }
+    it { expect(report.select_columns(dataset)).to be_an_instance_of(Sequel::Mysql2::Dataset) }
   end
 
 end
