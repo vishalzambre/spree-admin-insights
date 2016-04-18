@@ -5,45 +5,52 @@ module Spree
     SEARCH_ATTRIBUTES = { start_date: :promotion_created_from, end_date: :promotion_created_till }
     SORTABLE_ATTRIBUTES = [:promotion_name, :usage_count, :promotion_discount, :promotion_code, :promotion_start_date, :promotion_end_date]
 
+    def self.no_pagination?
+      true
+    end
+
     def initialize(options)
       super
       set_sortable_attributes(options, DEFAULT_SORTABLE_ATTRIBUTE)
     end
 
     def generate(options = {})
-      initialize_months_table
-      ids = Spree::Promotion.pluck(:id)
-      ids.map do |_id|
-        adjustments_with_month_name = SpreeReportify::ReportDb[:spree_adjustments___adjustments].
-        join(:spree_promotion_actions___promotion_actions, id: :source_id).
-        join(:spree_promotions___promotions, id: :promotion_id).
-        where(adjustments__source_type: "Spree::PromotionAction", promotions__id: _id).
-        where(promotions__created_at: @start_date..@end_date). #filter by params
-        select{[
-          Sequel.as(abs(:amount), :promotion_discount),
-          Sequel.as(:promotions__id, :promotions_id),
-          :promotions__name___promotion_name,
-          Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
-          Sequel.as(YEAR(:adjustments__created_at), :year)
-        ]}
+      adjustments_with_month_name = SpreeReportify::ReportDb[:spree_adjustments___adjustments].
+      join(:spree_promotion_actions___promotion_actions, id: :source_id).
+      join(:spree_promotions___promotions, id: :promotion_id).
+      where(adjustments__source_type: "Spree::PromotionAction").
+      where(promotions__created_at: @start_date..@end_date). #filter by params
+      select{[
+        Sequel.as(abs(:amount), :promotion_discount),
+        Sequel.as(:promotions__id, :promotions_id),
+        :promotions__name___promotion_name,
+        :promotions__code___promotion_code,
+        Sequel.as(DATE_FORMAT(promotions__starts_at,'%d %b %y'), :promotion_start_date),
+        Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
+        Sequel.as(YEAR(:adjustments__created_at), :year),
+        Sequel.as(MONTH(:adjustments__created_at), :number)
+      ]}
 
-        default_promotion_name = Spree::Promotion.find(_id).name
-
-        SpreeReportify::ReportDb[adjustments_with_month_name].
-        right_outer_join(:months, name: :month_name).
-        group(:months_name, :promotions_id).
-        # order(:promotions_id, :sort_year, :number).
-        order(:sort_year, :number).
-        select{[
-          months__number,
-          Sequel.as(IFNULL(year, 2016), :sort_year),
-          Sequel.as(concat(name, ' ', IFNULL(year, 2016)), :months_name),
-          Sequel.as(IFNULL(SUM(promotion_discount), 0), :promotion_discount),
-          Sequel.as(IFNULL(promotion_name, default_promotion_name), :promotion_name),
-          Sequel.as(count(:promotions_id), :usage_count),
-          Sequel.as(IFNULL(promotions_id, _id), :promotions_id)
-        ]}.all
-      end.flatten
+      group_by_months = SpreeReportify::ReportDb[adjustments_with_month_name].
+      group(:months_name, :promotions_id).
+      order(:year, :number).
+      select{[
+        number,
+        promotion_name,
+        year,
+        promotion_code,
+        promotion_start_date,
+        Sequel.as(concat(month_name, ' ', year), :months_name),
+        promotion_discount,
+        Sequel.as(count(:promotions_id), :usage_count),
+        promotions_id
+      ]}
+      grouped_by_promotion = group_by_months.all.group_by { |record| record[:promotion_name] }
+      data = []
+      grouped_by_promotion.each_pair do |promotion_name, collection|
+        data << fill_missing_values({ promotion_discount: 0, usage_count: 0, promotion_name: promotion_name }, collection)
+      end
+      data.flatten
     end
 
     def chart_data
@@ -61,7 +68,6 @@ module Spree
           {
             id: 'promotional-cost',
             json: {
-              chart: { type: 'column' },
               title: { text: 'Promotional Cost' },
               xAxis: { categories: chart_data[:months_name] },
               yAxis: {
@@ -74,7 +80,8 @@ module Spree
                   verticalAlign: 'middle',
                   borderWidth: 0
               },
-              series: chart_data[:collection].map { |key, value| { name: key, data: value.map { |r| r[:promotion_discount].to_f } } }
+              series: chart_data[:collection].map { |key, value| { type: 'column', name: key, data: value.map { |r| r[:promotion_discount].to_f } } } +
+                chart_data[:collection].map { |key, value| { tooltip: { valuePrefix: '#' }, type: 'spline', name: key + ' usage count', data: value.map { |r| r[:usage_count].to_i } } }
             }
           }
         ]
