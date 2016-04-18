@@ -4,8 +4,11 @@ module Spree
     SEARCH_ATTRIBUTES = { start_date: :orders_created_from, end_date: :orders_created_till }
     SORTABLE_ATTRIBUTES = []
 
+    def self.no_pagination?
+      true
+    end
+
     def generate(options = {})
-      initialize_months_table
       order_join_line_item = SpreeReportify::ReportDb[:spree_orders___orders].
       exclude(completed_at: nil).
       where(orders__created_at: @start_date..@end_date). #filter by params
@@ -13,26 +16,25 @@ module Spree
       group(:line_items__order_id).
       select{[
         Sequel.as(SUM(IFNULL(line_items__cost_price, line_items__price) * line_items__quantity), :cost_price),
-        line_items__order_id,
         Sequel.as(orders__item_total, :sale_price),
         Sequel.as(orders__item_total - SUM(IFNULL(line_items__cost_price, line_items__price) * line_items__quantity), :profit_loss),
         Sequel.as(MONTHNAME(:orders__created_at), :month_name),
+        Sequel.as(MONTH(:orders__created_at), :number),
         Sequel.as(YEAR(:orders__created_at), :year)
       ]}
 
       group_by_months = SpreeReportify::ReportDb[order_join_line_item].
-      right_outer_join(:months, name: :month_name).
       group(:months_name).
-      order(:sort_year, :number).
+      order(:year, :number).
       select{[
-        months__number,
-        Sequel.as(IFNULL(year, 2016), :sort_year),
-        Sequel.as(concat(name, ' ', IFNULL(year, 2016)), :months_name),
+        number,
+        Sequel.as(IFNULL(year, 2016), :year),
+        Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
         Sequel.as(IFNULL(SUM(sale_price), 0), :sale_price),
         Sequel.as(IFNULL(SUM(cost_price), 0), :cost_price),
         Sequel.as(IFNULL(SUM(profit_loss), 0), :profit_loss)
       ]}
-      group_by_months
+      fill_missing_values({cost_price: 0, sale_price: 0, profit_loss: 0}, group_by_months.all)
     end
 
     def select_columns(dataset)
@@ -49,14 +51,17 @@ module Spree
       }
     end
 
+    # extract it in report.rb
     def chart_data
-      @data ||= SpreeReportify::ReportDb[generate].
-      select{[
-        Sequel.as(group_concat(profit_loss), :profit_loss),
-        Sequel.as(group_concat(sale_price), :sale_price),
-        Sequel.as(group_concat(cost_price), :cost_price),
-        Sequel.as(group_concat(months_name), :months_name)
-      ]}.first
+      unless @data
+        @data = Hash.new {|h, k| h[k] = [] }
+        generate.each do |object|
+          object.each_pair do |key, value|
+            @data[key].push(value)
+          end
+        end
+      end
+      @data
     end
 
     # ---------------------------------------------------- Graph Jsons --------------------------------------------------
@@ -66,7 +71,7 @@ module Spree
         id: 'profit-loss',
         json: {
           title: { text: 'Profit/Loss' },
-          xAxis: { categories: chart_data[:months_name].split(',') },
+          xAxis: { categories: chart_data[:months_name] },
           yAxis: {
             title: { text: 'Value($)' }
           },
@@ -80,7 +85,7 @@ module Spree
           series: [
             {
               name: 'Profit Loss',
-              data: chart_data[:profit_loss].split(',').map(&:to_f)
+              data: chart_data[:profit_loss].map(&:to_f)
             }
           ]
         }
@@ -93,7 +98,7 @@ module Spree
         json: {
           chart: { type: 'column' },
           title: { text: 'Sale Price' },
-          xAxis: { categories: chart_data[:months_name].split(',') },
+          xAxis: { categories: chart_data[:months_name] },
           yAxis: {
             title: { text: 'Value($)' }
           },
@@ -107,11 +112,11 @@ module Spree
           series: [
             {
               name: 'Sale Price',
-              data: chart_data[:sale_price].split(',').map(&:to_f)
+              data: chart_data[:sale_price].map(&:to_f)
             },
             {
               name: 'Cost Price',
-              data: chart_data[:cost_price].split(',').map(&:to_f)
+              data: chart_data[:cost_price].map(&:to_f)
             }
           ]
         }
