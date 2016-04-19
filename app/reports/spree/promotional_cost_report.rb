@@ -26,6 +26,7 @@ module Spree
         :promotions__name___promotion_name,
         :promotions__code___promotion_code,
         Sequel.as(DATE_FORMAT(promotions__starts_at,'%d %b %y'), :promotion_start_date),
+        Sequel.as(DATE_FORMAT(promotions__expires_at,'%d %b %y'), :promotion_end_date),
         Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
         Sequel.as(YEAR(:adjustments__created_at), :year),
         Sequel.as(MONTH(:adjustments__created_at), :number)
@@ -40,6 +41,7 @@ module Spree
         year,
         promotion_code,
         promotion_start_date,
+        promotion_end_date,
         Sequel.as(concat(month_name, ' ', year), :months_name),
         promotion_discount,
         Sequel.as(count(:promotions_id), :usage_count),
@@ -50,14 +52,25 @@ module Spree
       grouped_by_promotion.each_pair do |promotion_name, collection|
         data << fill_missing_values({ promotion_discount: 0, usage_count: 0, promotion_name: promotion_name }, collection)
       end
-      data.flatten
+      @data = data.flatten
+    end
+
+    def sum_of_discount_and_usage(dataset)
+      [{ months_name: 'Yearly',
+         promotion_name: dataset.first[:promotion_name],
+         promotion_discount: dataset.sum { |r| r[:promotion_discount] },
+         usage_count: dataset.sum { |r| r[:usage_count] }
+      }]
+    end
+
+    def group_by_promotion_name
+      @grouped_by_promotion_name ||= @data.group_by { |record| record[:promotion_name] }
     end
 
     def chart_data
-      grouped_by_promotion = generate.group_by { |record| record[:promotion_name] }
       {
-        months_name: grouped_by_promotion.first.second.map {|record| record[:months_name]},
-        collection: grouped_by_promotion
+        months_name: group_by_promotion_name.first.second.map { |record| record[:months_name] },
+        collection: group_by_promotion_name
       }
     end
 
@@ -65,26 +78,53 @@ module Spree
       {
         chart: true,
         charts: [
-          {
-            id: 'promotional-cost',
-            json: {
-              title: { text: 'Promotional Cost' },
-              xAxis: { categories: chart_data[:months_name] },
-              yAxis: {
-                title: { text: 'Value($)' }
-              },
-              tooltip: { valuePrefix: '$' },
-              legend: {
-                  layout: 'vertical',
-                  align: 'right',
-                  verticalAlign: 'middle',
-                  borderWidth: 0
-              },
-              series: chart_data[:collection].map { |key, value| { type: 'column', name: key, data: value.map { |r| r[:promotion_discount].to_f } } } +
-                chart_data[:collection].map { |key, value| { tooltip: { valuePrefix: '#' }, type: 'spline', name: key + ' usage count', data: value.map { |r| r[:usage_count].to_i } } }
-            }
-          }
+          promotional_cost_chart_json,
+          usage_count_chart_json
         ]
+      }
+    end
+
+    def promotional_cost_chart_json
+      {
+        id: 'promotional-cost',
+        json: {
+          chart: { type: 'column' },
+          title: { text: 'Promotional Cost' },
+          xAxis: { categories: chart_data[:months_name] },
+          yAxis: {
+            title: { text: 'Value($)' }
+          },
+          tooltip: { valuePrefix: '$' },
+          legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle',
+              borderWidth: 0
+          },
+          series: chart_data[:collection].map { |key, value| { type: 'column', name: key, data: value.map { |r| r[:promotion_discount].to_f } } }
+        }
+      }
+    end
+
+    def usage_count_chart_json
+      {
+        id: 'promotion-usage-count',
+        json: {
+          chart: { type: 'spline' },
+          title: { text: 'Promotion Usage Count' },
+          xAxis: { categories: chart_data[:months_name] },
+          yAxis: {
+            title: { text: 'Count' }
+          },
+          tooltip: { valuePrefix: '#' },
+          legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle',
+              borderWidth: 0
+          },
+          series: chart_data[:collection].map { |key, value| { name: key, data: value.map { |r| r[:usage_count].to_i } } }
+        }
       }
     end
 
