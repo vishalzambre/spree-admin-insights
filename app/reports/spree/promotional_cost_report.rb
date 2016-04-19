@@ -19,7 +19,7 @@ module Spree
       join(:spree_promotion_actions___promotion_actions, id: :source_id).
       join(:spree_promotions___promotions, id: :promotion_id).
       where(adjustments__source_type: "Spree::PromotionAction").
-      where(promotions__created_at: @start_date..@end_date). #filter by params
+      where(adjustments__created_at: @start_date..@end_date). #filter by params
       select{[
         Sequel.as(abs(:amount), :promotion_discount),
         Sequel.as(:promotions__id, :promotions_id),

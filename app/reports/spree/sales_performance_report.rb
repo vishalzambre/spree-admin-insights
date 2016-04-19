@@ -1,6 +1,6 @@
 module Spree
   class SalesPerformanceReport < Spree::Report
-    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, profit_loss: :integer }
+    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, profit_loss: :integer, promotion_discount: :integer }
     SEARCH_ATTRIBUTES = { start_date: :orders_created_from, end_date: :orders_created_till }
     SORTABLE_ATTRIBUTES = []
 
@@ -33,9 +33,48 @@ module Spree
         Sequel.as(IFNULL(SUM(sale_price), 0), :sale_price),
         Sequel.as(IFNULL(SUM(cost_price), 0), :cost_price),
         Sequel.as(IFNULL(SUM(profit_loss), 0), :profit_loss),
-        Sequel.as((IFNULL(SUM(profit_loss), 0) / SUM(cost_price)) * 100, :profit_loss_percent)
+        Sequel.as((IFNULL(SUM(profit_loss), 0) / SUM(cost_price)) * 100, :profit_loss_percent),
+        Sequel.as(0, :promotion_discount)
       ]}
-      fill_missing_values({ cost_price: 0, sale_price: 0, profit_loss: 0, profit_loss_percent: 0 }, group_by_months.all)
+
+      adjustments_with_month_name = SpreeReportify::ReportDb[:spree_adjustments___adjustments].
+      where(adjustments__source_type: "Spree::PromotionAction").
+      where(adjustments__created_at: @start_date..@end_date). #filter by params
+      select{[
+        Sequel.as(abs(:amount), :promotion_discount),
+        Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
+        Sequel.as(YEAR(:adjustments__created_at), :year),
+        Sequel.as(MONTH(:adjustments__created_at), :number)
+      ]}
+
+      promotions_group_by_months = SpreeReportify::ReportDb[adjustments_with_month_name].
+      group(:months_name).
+      order(:year, :number).
+      select{[
+        number,
+        year,
+        Sequel.as(concat(month_name, ' ', year), :months_name),
+        Sequel.as(0, :sale_price),
+        Sequel.as(0, :cost_price),
+        Sequel.as(0, :profit_loss),
+        Sequel.as(0, :profit_loss_percent),
+        Sequel.as(SUM(promotion_discount), :promotion_discount)
+      ]}
+
+      union_stats = SpreeReportify::ReportDb[group_by_months.union(promotions_group_by_months)].
+      group(:months_name).
+      order(:year, :number).
+      select{[
+        number,
+        year,
+        months_name,
+        Sequel.as(SUM(sale_price), :sale_price),
+        Sequel.as(SUM(cost_price), :cost_price),
+        Sequel.as(SUM(profit_loss), :profit_loss),
+        Sequel.as(SUM(profit_loss_percent), :profit_loss_percent),
+        Sequel.as(SUM(promotion_discount), :promotion_discount)
+      ]}
+      fill_missing_values({ cost_price: 0, sale_price: 0, profit_loss: 0, profit_loss_percent: 0, promotion_discount: 0 }, union_stats.all)
     end
 
     def select_columns(dataset)
@@ -123,6 +162,10 @@ module Spree
             {
               name: 'Cost Price',
               data: chart_data[:cost_price].map(&:to_f)
+            },
+            {
+              name: 'Promotional Cost',
+              data: chart_data[:promotion_discount].map(&:to_f)
             }
           ]
         }
