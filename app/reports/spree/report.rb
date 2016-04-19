@@ -53,17 +53,7 @@ module Spree
     def chart_json
       {
         chart: false,
-        json: {
-          xAxis: {
-            data: nil,
-            categories: nil
-          },
-          yAxis: {
-            title: {
-              text: 'Values'
-            }
-          }
-        }
+        charts: []
       }
     end
 

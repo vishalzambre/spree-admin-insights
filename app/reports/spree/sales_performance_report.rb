@@ -32,9 +32,10 @@ module Spree
         Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
         Sequel.as(IFNULL(SUM(sale_price), 0), :sale_price),
         Sequel.as(IFNULL(SUM(cost_price), 0), :cost_price),
-        Sequel.as(IFNULL(SUM(profit_loss), 0), :profit_loss)
+        Sequel.as(IFNULL(SUM(profit_loss), 0), :profit_loss),
+        Sequel.as((IFNULL(SUM(profit_loss), 0) / SUM(cost_price)) * 100, :profit_loss_percent)
       ]}
-      fill_missing_values({cost_price: 0, sale_price: 0, profit_loss: 0}, group_by_months.all)
+      fill_missing_values({ cost_price: 0, sale_price: 0, profit_loss: 0, profit_loss_percent: 0 }, group_by_months.all)
     end
 
     def select_columns(dataset)
@@ -73,9 +74,8 @@ module Spree
           title: { text: 'Profit/Loss' },
           xAxis: { categories: chart_data[:months_name] },
           yAxis: {
-            title: { text: 'Value($)' }
+            title: { text: 'Value' }
           },
-          tooltip: { valuePrefix: '$' },
           legend: {
               layout: 'vertical',
               align: 'right',
@@ -85,7 +85,13 @@ module Spree
           series: [
             {
               name: 'Profit Loss',
+              tooltip: { valuePrefix: '$' },
               data: chart_data[:profit_loss].map(&:to_f)
+            },
+            {
+              name: 'Profit Loss Percent(%)',
+              tooltip: { valueSuffix: '%' },
+              data: chart_data[:profit_loss_percent].map(&:to_f)
             }
           ]
         }
