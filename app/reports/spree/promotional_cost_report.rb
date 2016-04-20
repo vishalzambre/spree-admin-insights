@@ -55,14 +55,6 @@ module Spree
       @data = data.flatten
     end
 
-    def sum_of_discount_and_usage(dataset)
-      [{ months_name: 'Yearly',
-         promotion_name: dataset.first[:promotion_name],
-         promotion_discount: dataset.sum { |r| r[:promotion_discount] },
-         usage_count: dataset.sum { |r| r[:usage_count] }
-      }]
-    end
-
     def group_by_promotion_name
       @grouped_by_promotion_name ||= @data.group_by { |record| record[:promotion_name] }
     end
