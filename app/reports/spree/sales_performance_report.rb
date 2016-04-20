@@ -1,6 +1,6 @@
 module Spree
   class SalesPerformanceReport < Spree::Report
-    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, profit_loss: :integer, promotion_discount: :integer }
+    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, promotion_discount: :integer, profit_loss: :integer }
     SEARCH_ATTRIBUTES = { start_date: :orders_created_from, end_date: :orders_created_till }
     SORTABLE_ATTRIBUTES = []
 
@@ -56,7 +56,7 @@ module Spree
         Sequel.as(concat(month_name, ' ', year), :months_name),
         Sequel.as(0, :sale_price),
         Sequel.as(0, :cost_price),
-        Sequel.as(0, :profit_loss),
+        Sequel.as(SUM(promotion_discount) * (-1), :profit_loss),
         Sequel.as(0, :profit_loss_percent),
         Sequel.as(SUM(promotion_discount), :promotion_discount)
       ]}
@@ -71,7 +71,7 @@ module Spree
         Sequel.as(SUM(sale_price), :sale_price),
         Sequel.as(SUM(cost_price), :cost_price),
         Sequel.as(SUM(profit_loss), :profit_loss),
-        Sequel.as(SUM(profit_loss_percent), :profit_loss_percent),
+        Sequel.as((SUM(profit_loss) / SUM(cost_price)) * 100, :profit_loss_percent),
         Sequel.as(SUM(promotion_discount), :promotion_discount)
       ]}
       fill_missing_values({ cost_price: 0, sale_price: 0, profit_loss: 0, profit_loss_percent: 0, promotion_discount: 0 }, union_stats.all)
@@ -86,6 +86,7 @@ module Spree
         chart: true,
         charts: [
           profit_loss_chart_json,
+          profit_loss_percent_chart_json,
           sale_cost_price_chart_json
         ]
       }
@@ -126,7 +127,28 @@ module Spree
               name: 'Profit Loss',
               tooltip: { valuePrefix: '$' },
               data: chart_data[:profit_loss].map(&:to_f)
-            },
+            }
+          ]
+        }
+      }
+    end
+
+    def profit_loss_percent_chart_json
+      {
+        id: 'profit-loss',
+        json: {
+          title: { text: 'Profit/Loss Percent' },
+          xAxis: { categories: chart_data[:months_name] },
+          yAxis: {
+            title: { text: 'Value' }
+          },
+          legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle',
+              borderWidth: 0
+          },
+          series: [
             {
               name: 'Profit Loss Percent(%)',
               tooltip: { valueSuffix: '%' },
