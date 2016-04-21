@@ -114,7 +114,7 @@ module Spree
           title: { text: 'Profit/Loss' },
           xAxis: { categories: chart_data[:months_name] },
           yAxis: {
-            title: { text: 'Value' }
+            title: { text: 'Value($)' }
           },
           legend: {
               layout: 'vertical',
@@ -140,7 +140,7 @@ module Spree
           title: { text: 'Profit/Loss Percent' },
           xAxis: { categories: chart_data[:months_name] },
           yAxis: {
-            title: { text: 'Value' }
+            title: { text: 'Percentage(%)' }
           },
           legend: {
               layout: 'vertical',
@@ -164,7 +164,7 @@ module Spree
         id: 'sale-price',
         json: {
           chart: { type: 'column' },
-          title: { text: 'Sale Price' },
+          title: { text: 'Sales Performance' },
           xAxis: { categories: chart_data[:months_name] },
           yAxis: {
             title: { text: 'Value($)' }
