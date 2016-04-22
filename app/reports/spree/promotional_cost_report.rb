@@ -43,7 +43,7 @@ module Spree
         promotion_start_date,
         promotion_end_date,
         Sequel.as(concat(month_name, ' ', year), :months_name),
-        promotion_discount,
+        Sequel.as(SUM(promotion_discount), :promotion_discount),
         Sequel.as(count(:promotions_id), :usage_count),
         promotions_id
       ]}
