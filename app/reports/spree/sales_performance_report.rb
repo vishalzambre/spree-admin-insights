@@ -1,6 +1,6 @@
 module Spree
   class SalesPerformanceReport < Spree::Report
-    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, promotion_discount: :integer, profit_loss: :integer }
+    HEADERS = { months_name: :string, sale_price: :integer, cost_price: :integer, promotion_discount: :integer, profit_loss: :integer, profit_loss_percent: :integer }
     SEARCH_ATTRIBUTES = { start_date: :orders_created_from, end_date: :orders_created_till }
     SORTABLE_ATTRIBUTES = []
 
@@ -70,8 +70,8 @@ module Spree
         months_name,
         Sequel.as(SUM(sale_price), :sale_price),
         Sequel.as(SUM(cost_price), :cost_price),
-        Sequel.as(SUM(profit_loss), :profit_loss),
-        Sequel.as((SUM(profit_loss) / SUM(cost_price)) * 100, :profit_loss_percent),
+        Sequel.as(IF(SUM(profit_loss) > 0, concat('+', SUM(profit_loss)), SUM(profit_loss)), :profit_loss),
+        Sequel.as(ROUND((SUM(profit_loss) / SUM(cost_price)), 3) * 100, :profit_loss_percent),
         Sequel.as(SUM(promotion_discount), :promotion_discount)
       ]}
       fill_missing_values({ cost_price: 0, sale_price: 0, profit_loss: 0, profit_loss_percent: 0, promotion_discount: 0 }, union_stats.all)
