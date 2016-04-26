@@ -3,7 +3,7 @@ module Spree
 
     attr_accessor :sortable_attribute, :sortable_type
 
-    def self.no_pagination?
+    def no_pagination?
       false
     end
 
