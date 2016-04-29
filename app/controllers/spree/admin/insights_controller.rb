@@ -56,8 +56,7 @@ module Spree
           end
           format.pdf do
             render pdf: "#{ @report_name.to_s }",
-              disposition: 'attachment',
-              layout: 'spree/layouts/pdf.html'
+              disposition: 'attachment'
           end
         end
       end
