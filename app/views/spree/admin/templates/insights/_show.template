@@ -22,7 +22,7 @@
         <tr>
           {% for(var j = 0; j < o['headers'].length; j++) { %}
             <td>
-              {% if (o['headers'][j].value == 'profit_loss') { %}
+              {% if (o['headers'][j].value == 'profit_loss' || o['headers'][j].value == 'profit_loss_percent') { %}
                 {%= Math.abs(o['stats'][i][o['headers'][j].value] || 0) %}
                 {% if (o['stats'][i][o['headers'][j].value] > 0) { %}
                   <span class="glyphicon glyphicon-chevron-up profit-indicator"></span>
