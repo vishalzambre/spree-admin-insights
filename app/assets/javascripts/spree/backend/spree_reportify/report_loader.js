@@ -56,8 +56,8 @@ ReportLoader.prototype.init = function() {
 ReportLoader.prototype.setDefaultReport = function() {
   if(location.pathname == '/admin/insights') {
     this.$selectList.val($(this.$selectList.find('option')[1]).val()).change();
+    window.history.pushState({}, '', this.$selectList.find(':selected').data('url'));
   }
-  window.history.pushState({}, '', this.$selectList.find(':selected').data('url'));
 };
 
 ReportLoader.prototype.bindEvents = function() {
@@ -204,7 +204,7 @@ ReportLoader.prototype.pushUrlToHistory = function() {
 
 ReportLoader.prototype.populateInitialData = function() {
   var $selectedOption = this.$selectList.find(':selected');
-  this.fetchChartDataWithoutState($selectedOption.data('url'), $selectedOption);
+  this.fetchChartDataWithoutState(location.href, $selectedOption);
 };
 
 $(function() {

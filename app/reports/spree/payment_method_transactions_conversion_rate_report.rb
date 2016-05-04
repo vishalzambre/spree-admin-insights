@@ -16,7 +16,7 @@ module Spree
       select{[
         payment_method_id,
         Sequel.as(name, :payment_method_name),
-        Sequel.as(IF(STRCMP(state, 'pending'), state, concat('capturing ', state)), :payment_state),
+        Sequel.as(IF(STRCMP(state, 'pending'), state, 'to be captured'), :payment_state),
         Sequel.as(MONTHNAME(:payments__created_at), :month_name),
         Sequel.as(MONTH(:payments__created_at), :number),
         Sequel.as(YEAR(:payments__created_at), :year)
