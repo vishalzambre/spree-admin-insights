@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_reportify'
-  s.version     = '3.0.7'
+  s.version     = '3.1.0'
   s.summary     = 'Add gem summary here'
   s.description = 'Add (optional) gem description here'
   s.required_ruby_version = '>= 2.1.0'
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  spree_version = '~> 3.0.7'
+  spree_version = '~> 3.1.0.rc1'
 
   s.add_dependency 'spree_core', spree_version
 
@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'coffee-rails', '~> 4.0.0'
   s.add_development_dependency 'database_cleaner', '~> 1.2.0'
   s.add_development_dependency 'factory_girl', '~> 4.5'
-  s.add_development_dependency 'ffaker', '~> 1.32.0'
+  s.add_development_dependency 'ffaker', '~> 2.2.0'
   s.add_development_dependency 'mysql2', '~> 0.4.0'
   s.add_development_dependency 'pg', '~> 0.18.0'
   s.add_development_dependency 'rspec-rails',  '~> 3.1'
