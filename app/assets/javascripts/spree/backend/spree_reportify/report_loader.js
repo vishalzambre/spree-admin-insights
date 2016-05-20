@@ -204,7 +204,7 @@ ReportLoader.prototype.pushUrlToHistory = function() {
 
 ReportLoader.prototype.populateInitialData = function() {
   var $selectedOption = this.$selectList.find(':selected');
-  this.fetchChartDataWithoutState($selectedOption.data('url'), $selectedOption);
+  this.fetchChartDataWithoutState(location.href, $selectedOption);
 };
 
 $(function() {
