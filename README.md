@@ -9,7 +9,7 @@ Installation
 Add spree_reportify to your Gemfile:
 
 ```ruby
-gem 'spree_reportify'
+gem 'spree_reportify', git: 'git@github.com:Physicianlaboratories/spree-ecom-reports-extension.git'
 ```
 
 Bundle your dependencies and run the installation generator:
