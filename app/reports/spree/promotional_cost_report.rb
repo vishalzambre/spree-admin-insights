@@ -18,7 +18,11 @@ module Spree
       adjustments_with_month_name = SpreeReportify::ReportDb[:spree_adjustments___adjustments].
       join(:spree_promotion_actions___promotion_actions, id: :source_id).
       join(:spree_promotions___promotions, id: :promotion_id).
+      join(:spree_orders___orders, id: :adjustments__order_id).
+      exclude(orders__completed_at: nil).
+      where(adjustments__eligible: true).
       where(adjustments__source_type: "Spree::PromotionAction").
+      where(orders__canceled_at: nil).
       where(adjustments__created_at: @start_date..@end_date). #filter by params
       select{[
         Sequel.as(abs(:amount), :promotion_discount),

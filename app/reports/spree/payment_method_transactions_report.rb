@@ -12,7 +12,11 @@ module Spree
     def generate
       payments = SpreeReportify::ReportDb[:spree_payment_methods___payment_methods].
       join(:spree_payments___payments, payment_method_id: :id).
-      where(payments__created_at: @start_date..@end_date). #filter by params
+      join(:spree_orders___orders, id: :order_id).
+      exclude(orders__completed_at: nil).
+      where(payments__created_at: @start_date..@end_date).
+      where(payments__state: 'completed'). #filter by params
+      where(orders__canceled_at: nil).
       select{[
         Sequel.as(payment_methods__name, :payment_method_name),
         Sequel.as(payments__amount, :payment_amount),
