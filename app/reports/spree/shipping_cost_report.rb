@@ -12,6 +12,7 @@ module Spree
       order_join_shipments = SpreeReportify::ReportDb[:spree_orders___orders].
       exclude(completed_at: nil).
       join(:spree_shipments___shipments, order_id: :id).
+      where(orders__canceled_at: nil).
       where(orders__created_at: @start_date..@end_date). #filter by params
       select{[
         Sequel.as(shipments__id, :shipment_id),
