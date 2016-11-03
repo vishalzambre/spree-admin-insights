@@ -1,9 +1,9 @@
 module Spree
   class BestSellingProductsReport < Spree::Report
     DEFAULT_SORTABLE_ATTRIBUTE = :sold_count
-    HEADERS = { sku: :string, product_name: :string, sold_count: :integer }
+    HEADERS = {sku: :string, product_name: :string, sold_count: :integer, revenue: :integer}
     SEARCH_ATTRIBUTES = { start_date: :orders_completed_from, end_date: :orders_completed_to }
-    SORTABLE_ATTRIBUTES = [:product_name, :sku, :sold_count]
+    SORTABLE_ATTRIBUTES = [:product_name, :sku, :sold_count, :revenue]
 
     def initialize(options)
       super
@@ -19,15 +19,16 @@ module Spree
       join(:spree_products___products, products__id: :variants__product_id).
       where(orders__state: 'complete').
       where(orders__completed_at: @start_date..@end_date). #filter by params
-      group(:variant_id).
+      group(:variant_id, :variants__sku, :products__name).
       order(sortable_sequel_expression)
     end
 
     def select_columns(dataset)
       dataset.select{[
-        products__name.as(product_name),
-        Sequel.as(IF(STRCMP(variants__sku, ''), variants__sku, products__name), :sku),
-        sum(quantity).as(sold_count)
+          products__name.as(product_name),
+          Sequel.as(Sequel.case({'' => variants__sku}, products__name, variants__sku), :sku),
+          sum(quantity).as(sold_count),
+          sum(quantity * price).as(revenue)
       ]}
     end
   end
