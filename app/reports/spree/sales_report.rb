@@ -76,7 +76,7 @@ module Spree
           where(orders__payment_state: 'paid').
           where(orders__shipment_state: 'ready').
           left_join(:spree_line_items___line_items,
-                    line_items__id: :orders__id).
+                    line_items__order_id: :orders__id).
           left_join(:spree_adjustments___adjustments,
                     adjustments__adjustable_type: 'Spree::Order',
                     adjustments__order_id: :orders__id,
