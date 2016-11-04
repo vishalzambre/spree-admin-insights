@@ -154,7 +154,7 @@ en:
         title: Best Selling Products
         description: Best/least Selling Products as per maximum quantities purchased.
         product_name: Product
-        sku: Variant
+        sku: SKU
         sold_count: Sold Quantity
         revenue: Revenue
       product_views_to_purchases:

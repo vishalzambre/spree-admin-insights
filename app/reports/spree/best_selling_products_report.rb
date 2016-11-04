@@ -26,7 +26,7 @@ module Spree
     def select_columns(dataset)
       dataset.select{[
           products__name.as(product_name),
-          Sequel.as(Sequel.case({'' => variants__sku}, products__name, variants__sku), :sku),
+          variants__sku.as(sku),
           sum(quantity).as(sold_count),
           sum(quantity * price).as(revenue)
       ]}
