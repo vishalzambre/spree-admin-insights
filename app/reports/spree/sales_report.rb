@@ -82,8 +82,10 @@ module Spree
                     adjustments__order_id: :orders__id,
                     adjustments__source_type: 'Spree::PromotionAction',
                     adjustments__eligible: true).
+          left_join(:spree_promotion_actions___promotion_actions,
+                    promotion_actions__id: :adjustments__source_id).
           left_join(:spree_promotions___promotions,
-                    promotions__id: :adjustments__source_id).
+                    promotions__id: :promotion_actions__promotion_id).
           left_join(:spree_variants___variants,
                     variants__id: :line_items__variant_id).
           left_join(products_with_taxons.as(:products),
