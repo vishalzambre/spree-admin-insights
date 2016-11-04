@@ -110,8 +110,7 @@ en:
         title: Sales
         description: Lots of things
         order_number: Order no.
-        completed_at_date: Date
-        completed_at_time: Time
+        completed_at: Date
         item_total: Product
         shipment_total: Delivery fee
         total_before_additional_tax: Total excl. GST

@@ -1,10 +1,9 @@
 module Spree
   class SalesReport < Spree::Report
-    DEFAULT_SORTABLE_ATTRIBUTE = :completed_at_date
+    DEFAULT_SORTABLE_ATTRIBUTE = :completed_at
     HEADERS = {
         order_number: :string,
-        completed_at_date: :string,
-        completed_at_time: :string,
+        completed_at: :string,
         item_total: :integer,
         shipment_total: :integer,
         total_before_additional_tax: :integer,
@@ -27,8 +26,7 @@ module Spree
     SEARCH_ATTRIBUTES = {start_date: :orders_completed_from, end_date: :orders_completed_to}
     SORTABLE_ATTRIBUTES = [
         :order_number,
-        :completed_at_date,
-        :completed_at_time,
+        :completed_at,
         :item_total,
         :shipment_total,
         :total_before_additional_tax,
@@ -104,10 +102,8 @@ module Spree
         [
             Sequel.as(:orders__number,
                       :order_number),
-            Sequel.as(Sequel.cast(:orders__completed_at, :date),
-                      :completed_at_date),
-            Sequel.as(Sequel.function(:date_trunc, 'second', Sequel.cast(:orders__completed_at, :time)),
-                      :completed_at_time),
+            Sequel.as(Sequel.function(:to_char, :orders__completed_at, 'DD/MM/YY HH24:MI:SS'),
+                      :completed_at),
             Sequel.as(:orders__item_total,
                       :item_total),
             Sequel.as(:orders__shipment_total,
