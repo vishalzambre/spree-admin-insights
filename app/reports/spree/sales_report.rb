@@ -102,7 +102,7 @@ module Spree
         [
             Sequel.as(:orders__number,
                       :order_number),
-            Sequel.as(Sequel.function(:to_char, :orders__completed_at, 'DD/MM/YY HH24:MI:SS'),
+            Sequel.as(Sequel.function(:to_char, :orders__completed_at, 'YYYY-MM-DD HH24:MI:SS'),
                       :completed_at),
             Sequel.as(:orders__item_total,
                       :item_total),
