@@ -15,7 +15,7 @@ module Spree
     end
 
     def generate(options = {})
-      adjustments_with_month_name = SpreeReportify::ReportDb[:spree_adjustments___adjustments].
+      adjustments_with_month_name = SpreeAdminInsights::ReportDb[:spree_adjustments___adjustments].
       join(:spree_promotion_actions___promotion_actions, id: :source_id).
       join(:spree_promotions___promotions, id: :promotion_id).
       join(:spree_orders___orders, id: :adjustments__order_id).
@@ -36,7 +36,7 @@ module Spree
         Sequel.as(MONTH(:adjustments__created_at), :number)
       ]}
 
-      group_by_months = SpreeReportify::ReportDb[adjustments_with_month_name].
+      group_by_months = SpreeAdminInsights::ReportDb[adjustments_with_month_name].
       group(:months_name, :promotions_id).
       order(:year, :number).
       select{[
