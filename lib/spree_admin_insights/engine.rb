@@ -1,4 +1,4 @@
-module SpreeReportify
+module SpreeAdminInsights
   class Engine < Rails::Engine
     require 'spree/core'
     require 'sequel'
@@ -6,7 +6,7 @@ module SpreeReportify
     require 'csv'
 
     isolate_namespace Spree
-    engine_name 'spree_reportify'
+    engine_name 'spree_admin_insights'
 
     # use rspec for tests
     config.generators do |g|
@@ -23,7 +23,7 @@ module SpreeReportify
 
     config.after_initialize do
       # Connect to applications DB using ruby's Sequel wrapper
-      ::SpreeReportify::ReportDb = Sequel.connect(Rails.configuration.database_configuration[Rails.env])
+      ::SpreeAdminInsights::ReportDb = Sequel.connect(Rails.configuration.database_configuration[Rails.env])
     end
   end
 end
