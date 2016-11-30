@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
-  s.name        = 'spree_reportify'
+  s.name        = 'spree_admin_insights'
   s.version     = '3.1.0'
   s.summary     = 'Add gem summary here'
   s.description = 'Add (optional) gem description here'
