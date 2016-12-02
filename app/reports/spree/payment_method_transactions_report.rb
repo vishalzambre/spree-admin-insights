@@ -16,9 +16,9 @@ module Spree
       select{[
         Sequel.as(payment_methods__name, :payment_method_name),
         Sequel.as(payments__amount, :payment_amount),
-        Sequel.as(MONTHNAME(:payments__created_at), :month_name),
-        Sequel.as(MONTH(:payments__created_at), :number),
-        Sequel.as(YEAR(:payments__created_at), :year)
+        Sequel.as(to_char(:payments__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:month, :payments__created_at), :number),
+        Sequel.as(Sequel.extract(:year, :payments__created_at), :year)
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[payments].

@@ -18,9 +18,9 @@ module Spree
         Sequel.as(orders__shipment_total, :shipping_charge),
         Sequel.as(shipments__order_id, :order_id),
         Sequel.as(orders__total, :order_total),
-        Sequel.as(MONTHNAME(:orders__created_at), :month_name),
-        Sequel.as(MONTH(:orders__created_at), :number),
-        Sequel.as(YEAR(:orders__created_at), :year)
+        Sequel.as(to_char(:orders__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:month, :orders__created_at), :number),
+        Sequel.as(Sequel.extract(:year, :orders__created_at), :year)
       ]}.as(:order_shipment)
 
       order_shipment_join_shipment_rates = SpreeAdminInsights::ReportDb[order_join_shipments].
@@ -34,13 +34,13 @@ module Spree
         month_name,
         number,
         year,
-        Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
+        Sequel.as(concat(month_name, ' ', COALESCE(year, 2016)), :months_name),
       ]}.as(:order_shipment_rates)
 
       revenue_table = SpreeAdminInsights::ReportDb[order_shipment_join_shipment_rates].
       group(:months_name).
       select{[
-        Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
+        Sequel.as(concat(month_name, ' ', COALESCE(year, 2016)), :months_name),
         Sequel.as(SUM(order_total), :revenue),
         order_id
       ]}
@@ -51,16 +51,16 @@ module Spree
       group(:months_name, :spree_shipping_methods__id).
       order(:year, :number).
       select{[
-        order_shipment_rates__order_id,
-        spree_shipping_methods__id,
-        Sequel.as(SUM(shipping_charge), :shipping_charge),
-        revenue,
-        shipping_method_id,
-        Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
-        Sequel.as(ROUND((SUM(shipping_charge) / revenue) * 100, 2), :shipping_cost_percentage),
-        number,
-        year,
-        name
+          order_shipment_rates__order_id,
+          spree_shipping_methods__id,
+          Sequel.as(SUM(shipping_charge), :shipping_charge),
+          revenue,
+          shipping_method_id,
+          Sequel.as(concat(month_name, ' ', COALESCE(year, 2016)), :months_name),
+          Sequel.as(ROUND((SUM(shipping_charge) / revenue) * 100, 2), :shipping_cost_percentage),
+          number,
+          year,
+          name
       ]}
 
       grouped_by_method_name = group_by_months.all.group_by { |record| record[:name] }

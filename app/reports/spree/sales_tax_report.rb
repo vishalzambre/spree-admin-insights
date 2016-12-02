@@ -18,9 +18,9 @@ module Spree
         Sequel.as(abs(adjustments__amount), :sales_tax),
         Sequel.as(:zones__id, :zone_id),
         :zones__name___zone_name,
-        Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
-        Sequel.as(YEAR(:adjustments__created_at), :year),
-        Sequel.as(MONTH(:adjustments__created_at), :number)
+        Sequel.as(to_char(:adjustments__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:year, :adjustments__created_at), :year),
+        Sequel.as(Sequel.extract(:month, :adjustments__created_at), :number)
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[adjustments_with_month_name].

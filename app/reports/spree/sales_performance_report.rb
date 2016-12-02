@@ -15,12 +15,12 @@ module Spree
       join(:spree_line_items___line_items, order_id: :id).
       group(:line_items__order_id).
       select{[
-        Sequel.as(SUM(IFNULL(line_items__cost_price, line_items__price) * line_items__quantity), :cost_price),
+        Sequel.as(SUM(COALESCE(line_items__cost_price, line_items__price) * line_items__quantity), :cost_price),
         Sequel.as(orders__item_total, :sale_price),
-        Sequel.as(orders__item_total - SUM(IFNULL(line_items__cost_price, line_items__price) * line_items__quantity), :profit_loss),
-        Sequel.as(MONTHNAME(:orders__created_at), :month_name),
-        Sequel.as(MONTH(:orders__created_at), :number),
-        Sequel.as(YEAR(:orders__created_at), :year)
+        Sequel.as(orders__item_total - SUM(COALESCE(line_items__cost_price, line_items__price) * line_items__quantity), :profit_loss),
+        Sequel.as(to_char(:orders__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:month, :orders__created_at), :number),
+        Sequel.as(Sequel.extract(:year, :orders__created_at), :year)
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[order_join_line_item].
@@ -28,12 +28,12 @@ module Spree
       order(:year, :number).
       select{[
         number,
-        Sequel.as(IFNULL(year, 2016), :year),
-        Sequel.as(concat(month_name, ' ', IFNULL(year, 2016)), :months_name),
-        Sequel.as(IFNULL(SUM(sale_price), 0), :sale_price),
-        Sequel.as(IFNULL(SUM(cost_price), 0), :cost_price),
-        Sequel.as(IFNULL(SUM(profit_loss), 0), :profit_loss),
-        Sequel.as((IFNULL(SUM(profit_loss), 0) / SUM(cost_price)) * 100, :profit_loss_percent),
+        Sequel.as(COALESCE(year, 2016), :year),
+        Sequel.as(concat(month_name, ' ', COALESCE(year, 2016)), :months_name),
+        Sequel.as(COALESCE(SUM(sale_price), 0), :sale_price),
+        Sequel.as(COALESCE(SUM(cost_price), 0), :cost_price),
+        Sequel.as(COALESCE(SUM(profit_loss), 0), :profit_loss),
+        Sequel.as((COALESCE(SUM(profit_loss), 0) / SUM(cost_price)) * 100, :profit_loss_percent),
         Sequel.as(0, :promotion_discount)
       ]}
 
@@ -42,9 +42,9 @@ module Spree
       where(adjustments__created_at: @start_date..@end_date). #filter by params
       select{[
         Sequel.as(abs(:amount), :promotion_discount),
-        Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
-        Sequel.as(YEAR(:adjustments__created_at), :year),
-        Sequel.as(MONTH(:adjustments__created_at), :number)
+        Sequel.as(to_char(:adjustments__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:year, :adjustments__created_at), :year),
+        Sequel.as(Sequel.extract(:month, :adjustments__created_at), :number)
       ]}
 
       promotions_group_by_months = SpreeAdminInsights::ReportDb[adjustments_with_month_name].

@@ -16,10 +16,10 @@ module Spree
       select{[
         payment_method_id,
         Sequel.as(name, :payment_method_name),
-        Sequel.as(IF(STRCMP(state, 'pending'), state, concat('capturing ', state)), :payment_state),
-        Sequel.as(MONTHNAME(:payments__created_at), :month_name),
-        Sequel.as(MONTH(:payments__created_at), :number),
-        Sequel.as(YEAR(:payments__created_at), :year)
+        Sequel.as(IF(STRCMP(state, 'pending'), state, 'capturing '), :payment_state),
+        Sequel.as(to_char(:payments__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:month, :payments__created_at), :number),
+        Sequel.as(Sequel.extract(:year, :payments__created_at), :year)
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[payment_methods].

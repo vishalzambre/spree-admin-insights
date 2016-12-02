@@ -25,11 +25,11 @@ module Spree
         Sequel.as(:promotions__id, :promotions_id),
         :promotions__name___promotion_name,
         :promotions__code___promotion_code,
-        Sequel.as(DATE_FORMAT(promotions__starts_at,'%d %b %y'), :promotion_start_date),
-        Sequel.as(DATE_FORMAT(promotions__expires_at,'%d %b %y'), :promotion_end_date),
-        Sequel.as(MONTHNAME(:adjustments__created_at), :month_name),
-        Sequel.as(YEAR(:adjustments__created_at), :year),
-        Sequel.as(MONTH(:adjustments__created_at), :number)
+        Sequel.as(DATE_FORMAT(promotions__starts_at, '%d %b %y'), :promotion_start_date),
+        Sequel.as(DATE_FORMAT(promotions__expires_at, '%d %b %y'), :promotion_end_date),
+        Sequel.as(to_char(:adjustments__created_at, 'Month'), :month_name),
+        Sequel.as(Sequel.extract(:year, :adjustments__created_at), :year),
+        Sequel.as(Sequel.extract(:month, :adjustments__created_at), :number)
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[adjustments_with_month_name].
