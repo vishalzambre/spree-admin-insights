@@ -13,23 +13,23 @@ module Spree
 
       def show
         @headers, @stats, @total_pages, @search_attributes, @chart_json, @resource = ReportGenerationService.generate_report(
-                                              @report_name,
-                                              params.merge(@pagination_hash)
-                                            )
+            @report_name,
+            params.merge(@pagination_hash)
+        )
 
         @report_data_json = {
-          current_page:      params[:page] || 0,
-          headers:           @headers,
-          report_type:       params[:type],
-          request_path:      request.path,
-          search_attributes: @search_attributes,
-          stats:             @stats,
-          total_pages:       @total_pages,
-          url:               request.url,
-          searched_fields:   params[:search],
-          per_page:          @pagination_hash[:records_per_page],
-          chart_json:        @chart_json,
-          pagination_required: !@resource.no_pagination?
+            current_page: params[:page] || 0,
+            headers: @headers,
+            report_type: params[:type],
+            request_path: request.path,
+            search_attributes: @search_attributes,
+            stats: @stats,
+            total_pages: @total_pages,
+            url: request.url,
+            searched_fields: params[:search],
+            per_page: @pagination_hash[:records_per_page],
+            chart_json: @chart_json,
+            pagination_required: !@resource.no_pagination?
         }
 
         respond_to do |format|

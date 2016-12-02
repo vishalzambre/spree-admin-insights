@@ -1,6 +1,5 @@
 module Spree
   class ReportGenerationService
-
     REPORTS = {
       finance_analysis: [
           :sales_performance,
@@ -68,14 +67,13 @@ module Spree
     def self.headers(klass, resource, report_name)
       klass::HEADERS.keys.map do |header|
         {
-          name: Spree.t(header.to_sym, scope: [:insight, report_name]),
-          value: header,
-          sorted: resource.try(:header_sorted?, header) ? resource.sortable_type.to_s : nil,
-          type: klass::HEADERS[header],
-          sortable: header.in?(klass::SORTABLE_ATTRIBUTES)
+            name: Spree.t(header.to_sym, scope: [:insight, report_name]),
+            value: header,
+            sorted: resource.try(:header_sorted?, header) ? resource.sortable_type.to_s : nil,
+            type: klass::HEADERS[header],
+            sortable: header.in?(klass::SORTABLE_ATTRIBUTES)
         }
       end
     end
-
   end
 end

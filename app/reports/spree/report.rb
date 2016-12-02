@@ -1,6 +1,5 @@
 module Spree
   class Report
-
     attr_accessor :sortable_attribute, :sortable_type
 
     def no_pagination?
@@ -14,7 +13,7 @@ module Spree
     def initialize(options)
       @search = options.fetch(:search, {})
       start_date = @search[:start_date]
-      @start_date = start_date.present? ? Date.parse(start_date) :  Date.new(Date.current.year)
+      @start_date = start_date.present? ? Date.parse(start_date) : Date.new(Date.current.year)
 
       end_date = @search[:end_date]
       # 1.day is added to date so that we can get current date records
@@ -37,13 +36,22 @@ module Spree
 
     def fill_missing_values(default_object, incomplete_result_set)
       complete_result_set = []
-      year_month_list = (@start_date..@end_date).map{ |date| [date.year, date.month] }.uniq
+      year_month_list = (@start_date..@end_date).map { |date| [date.year, date.month] }.uniq
       year_month_list.each do |year_month|
-        index = incomplete_result_set.index { |obj| obj[:year] == year_month.first && obj[:number] == year_month.second }
+        index = incomplete_result_set.index do |obj|
+          obj[:year] == year_month.first && obj[:number] == year_month.second
+        end
+
         if index
           complete_result_set.push(incomplete_result_set[index])
         else
-          filling_object = default_object.merge({ year: year_month.first, number: year_month.second, months_name: [Date::MONTHNAMES[year_month.second], year_month.first].join(' ') })
+          filling_object = default_object.merge(
+              {
+                  year: year_month.first,
+                  number: year_month.second,
+                  months_name: [Date::MONTHNAMES[year_month.second], year_month.first].join(' ')
+              }
+          )
           complete_result_set.push(filling_object)
         end
       end
@@ -52,11 +60,9 @@ module Spree
 
     def chart_json
       {
-        chart: false,
-        charts: []
+          chart: false,
+          charts: []
       }
     end
-
-
   end
 end
