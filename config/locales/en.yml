@@ -106,6 +106,30 @@ en:
         promotion_discount: Discount
         promotion_name: Promotion
         usage_count: Usage Count
+      sales:
+        title: Sales
+        description: Lots of things
+        order_number: Order no.
+        completed_at_date: Date
+        completed_at_time: Time
+        item_total: Product
+        shipment_total: Delivery fee
+        total_before_additional_tax: Total excl. GST
+        additional_tax_total: GST
+        total_after_additional_tax: Total incl. GST
+        adjustment_total: Discount
+        total_after_adjustments: Total after disc.
+        promotion_code: Discount code used
+        buyer_name: Name
+        buyer_gender: Sex
+        buyer_age: Age
+        buyer_zipcode: Postal code
+        product_taxons: Product category
+        product_sku: SKU
+        product_name: Product name
+        line_item_quantity: Units
+        line_item_price: $
+        line_item_total: Total $
       sales_performance:
         title: Sales Performance
         description: Info about revenue, tax, shipment total and return amount.

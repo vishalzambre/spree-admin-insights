@@ -2,6 +2,7 @@ module Spree
   class ReportGenerationService
     REPORTS = {
       finance_analysis: [
+          :sales,
           :sales_performance,
           :payment_method_transactions,
           :payment_method_transactions_conversion_rate,
