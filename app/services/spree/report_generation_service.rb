@@ -2,26 +2,26 @@ module Spree
   class ReportGenerationService
     REPORTS = {
       finance_analysis: [
-          :sales,
-          :sales_performance,
-          :payment_method_transactions,
-          :payment_method_transactions_conversion_rate,
-          :shipping_cost,
-          :sales_tax
+          :sales
+          # :sales_performance, # DISABLED
+          # :payment_method_transactions, # DISABLED
+          # :payment_method_transactions_conversion_rate, # DISABLED
+          # :shipping_cost, # DISABLED
+          # :sales_tax # DISABLED
       ],
       product_analysis: [
-          :best_selling_products,
-          :unique_purchases,
-          :returned_products
-      ],
-      promotion_analysis: [
-          :promotional_cost,
-          :annual_promotional_cost
-      ],
-      user_analysis: [
-          :users_not_converted,
-          :users_who_recently_purchased
+          :best_selling_products
+          # :unique_purchases, # DISABLED
+          # :returned_products # DISABLED
       ]
+      # promotion_analysis: [
+      #     :promotional_cost, # DISABLED
+      #     :annual_promotional_cost # DISABLED
+      # ],
+      # user_analysis: [
+      #     :users_not_converted, # DISABLED
+      #     :users_who_recently_purchased # DISABLED
+      # ]
     }
 
     def self.generate_report(report_name, options)
