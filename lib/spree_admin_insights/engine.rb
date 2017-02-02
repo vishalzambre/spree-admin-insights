@@ -23,7 +23,9 @@ module SpreeAdminInsights
 
     config.after_initialize do
       # Connect to applications DB using ruby's Sequel wrapper
-      ::SpreeAdminInsights::ReportDb = Sequel.connect(Rails.configuration.database_configuration[Rails.env])
+      db_config = (ActiveRecord::Base.configurations[Rails.env] ||
+                  Rails.application.config.database_configuration[Rails.env])
+      ::SpreeAdminInsights::ReportDb = Sequel.connect(db_config)
     end
   end
 end
