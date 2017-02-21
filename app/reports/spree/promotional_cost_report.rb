@@ -37,7 +37,7 @@ module Spree
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[adjustments_with_month_name].
-      group(:months_name, :promotions_id).
+      group(:year, :number, :months_name, :promotions_id).
       order(:year, :number).
       select{[
         number,

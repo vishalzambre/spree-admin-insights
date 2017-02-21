@@ -26,7 +26,7 @@ module Spree
       ]}
 
       group_by_months = SpreeAdminInsights::ReportDb[payments].
-      group(:months_name, :payment_method_name).
+      group(:year, :number, :months_name, :payment_method_name).
       order(:year, :number).
       select{[
         number,
