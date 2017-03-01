@@ -209,8 +209,8 @@ ReportLoader.prototype.populateInitialData = function() {
 
 $(function() {
   // Initialize only if we are on insights page
-  var is_admin_insights_page = $("[data-hook='admin_insights_div']").length;
-  if(is_admin_insights_page) {
+  var isAdminInsightsPage = $("[data-hook='admin_insights_div']").length;
+  if(isAdminInsightsPage) {
     var inputs = {
       insightsDiv:      $('#report-div'),
       reportsSelectBox: $('#reports'),
