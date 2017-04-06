@@ -22,8 +22,17 @@ module SpreeAdminInsights
     config.to_prepare &method(:activate).to_proc
 
     config.after_initialize do
+      def connnection_configurations
+        configuration_hash = Rails.configuration.database_configuration[Rails.env].to_h
+        if configuration_hash['adapter'] == 'sqlite3'
+          configuration_hash.merge!({ adapter: 'sqlite' })
+        end
+        configuration_hash
+      end
+
       # Connect to applications DB using ruby's Sequel wrapper
-      ::SpreeAdminInsights::ReportDb = Sequel.connect(Rails.configuration.database_configuration[Rails.env])
+      ::SpreeAdminInsights::ReportDb = Sequel.connect(connnection_configurations)
+
     end
   end
 end
