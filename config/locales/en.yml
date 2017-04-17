@@ -5,6 +5,10 @@ en:
     promotion_analysis: Promotion Analysis
     trending_search_analysis: Trending Search Analysis
     user_analysis: User Analysis
+    user_pool:
+      new_sign_ups: New users
+      active_users: Active Users(Registered)
+      guest_users: Guests
     insights: Insights
     insight:
       heading: 'Insights: %{type}'
