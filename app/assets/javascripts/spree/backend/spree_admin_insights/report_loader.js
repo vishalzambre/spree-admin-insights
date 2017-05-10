@@ -83,9 +83,9 @@ ReportLoader.prototype.bindEvents = function() {
 ReportLoader.prototype.resetFilters = function(event) {
   event.preventDefault();
   var $element = $(event.target),
-      noPagination = this.removePaginationButton.closest('span').hasClass('hide');
-  $element.attr('href', this.perPageSelector.data('url') + '&no_pagination=' + noPagination);
-  $element.data('url', this.perPageSelector.data('url') + '&no_pagination=' + noPagination);
+      paginated = !this.removePaginationButton.closest('span').hasClass('hide');
+  $element.attr('href', this.perPageSelector.data('url') + '&paginate=' + paginated);
+  $element.data('url', this.perPageSelector.data('url') + '&paginate=' + paginated);
   this.loadChart($element);
   this.searcherObject.clearSearchFields();
 };
@@ -187,7 +187,7 @@ ReportLoader.prototype.populateInsightsData = function(data) {
 ReportLoader.prototype.setDownloadLinksPath = function($selectedOption) {
   var _this = this;
   $.each(this.downloadLinks, function() {
-    $(this).attr('href', $(this).data('url') + '?id=' + _this.$selectList.val() + '&no_pagination=true');
+    $(this).attr('href', $(this).data('url') + '?id=' + _this.$selectList.val() + '&paginate=false');
   });
 };
 
