@@ -2,7 +2,7 @@ module Spree
   class PromotionalCostReport < Spree::Report
     DEFAULT_SORTABLE_ATTRIBUTE = :promotion_name
     HEADERS = { promotion_name: :string, usage_count: :integer, promotion_discount: :integer, promotion_code: :string, promotion_start_date: :date, promotion_end_date: :date }
-    SEARCH_ATTRIBUTES = { start_date: :promotion_created_from, end_date: :promotion_created_till }
+    SEARCH_ATTRIBUTES = { start_date: :promotion_applied_from, end_date: :promotion_applied_till }
     SORTABLE_ATTRIBUTES = [:promotion_name, :usage_count, :promotion_discount, :promotion_code, :promotion_start_date, :promotion_end_date]
 
     def no_pagination?
