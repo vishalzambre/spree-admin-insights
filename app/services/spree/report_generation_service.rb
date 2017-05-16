@@ -3,7 +3,7 @@ module Spree
 
     class << self
       delegate :reports, :report_exists?, :reports_for_category, :default_report_category, to: :configuration
-      delegate :configuration, to: SpreeAdminInsights
+      delegate :configuration, to: SpreeAdminInsights::Config
     end
 
     def self.generate_report(report_name, options)

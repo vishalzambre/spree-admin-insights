@@ -1,4 +1,4 @@
-class SpreeAdminInsights
+module SpreeAdminInsights
   class Engine < Rails::Engine
     require 'spree/core'
     require 'wicked_pdf'
