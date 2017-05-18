@@ -7,8 +7,8 @@
         <span class="icon icon-chevron-left pull-right"></span>
       </a>
       <ul data-hook="admin_configurations_sidebar_menu" class="collapse nav nav-pills nav-stacked" id="sidebar-insights">
-        <% Spree::ReportGenerationService::REPORTS.each do |_key, _value| %>
-          <li class="sidebar-menu-item <%= (selected?(params[:type], _key) ? 'selected' : '') %>"><%= link_to Spree.t(_key), admin_insight_path(type: _key, id: _value.first)  %></li>
+        <% Spree::ReportGenerationService.reports.each do |_key, _value| %>
+          <li class="sidebar-menu-item <%= (selected?(params[:report_category], _key) ? 'selected' : '') %>"><%= link_to Spree.t(_key), admin_insight_path(report_category: _key, id: _value.first)  %></li>
         <% end %>
       </ul>
     </li>

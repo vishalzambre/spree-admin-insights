@@ -1,5 +1,10 @@
 en:
   spree:
+    admin:
+      day_name: Day
+      hour_name: Hour
+      month_name: Month
+      year: Year
     finance_analysis: Finance Analysis
     product_analysis: Product Analysis
     promotion_analysis: Promotion Analysis
