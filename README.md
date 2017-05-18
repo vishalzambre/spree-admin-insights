@@ -5,18 +5,16 @@ When it comes to driving an Ecommerce business, knowing the right metrics and ac
 
 This extension provides extensive and targeted reports for the Admin. Which products were viewed the most yesterday, which brand is most popular in a particular geography, which user is a consistent buyer and much more, all the reports a website owner could probably need are a click away!
 
-Dependency
----------
-you need to install [spree_events_tracker](https://github.com/vinsol-spree-contrib/spree_events_tracker) gem.
+
 
 Features
 --------
 Elaborate reporting from the following categories are available:
-* Financial Analysis - Involves reports around sales, payment methods and shipping etc
-* Product Analysis - Insights of product purchase, abandoned cart etc
-* Promotional analysis - Reports of promotional costs etc are available.
-* Search Analysis - Search details reports.
-* User Analysis - Includes elaborate user analysis.
+* **Financial Analysis -** Involves reports around sales, payment methods and shipping etc
+* **Product Analysis -** Insights of product purchase, abandoned cart etc
+* **Promotional analysis - **Reports of promotional costs etc are available.
+* **Search Analysis - **Search details reports.
+* **User Analysis - **Includes elaborate user analysis.
 
 **Other features include :**
 * Search and Filter
@@ -31,13 +29,15 @@ Installation
 1. Add spree_admin_insights to your Gemfile:
 
   ```ruby
-  gem 'spree_admin_insights', git: 'https://github.com/vinsol-spree-contrib/spree-admin-insights'
+  gem 'spree_events_tracker'
+  gem 'spree_admin_insights'
   ```
 
 2. Bundle your dependencies and run the installation generator:
 
   ```shell
   bundle
+  bundle exec rails g spree_events_tracker:install # Ensure event tracker files are installed
   bundle exec rails g spree_admin_insights:install
   ```
 
@@ -64,4 +64,4 @@ Credits
 
 [![vinsol.com: Ruby on Rails, iOS and Android developers](http://vinsol.com/vin_logo.png "Ruby on Rails, iOS and Android developers")](http://vinsol.com)
 
-Copyright (c) 2016 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
+Copyright (c) 2017 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
