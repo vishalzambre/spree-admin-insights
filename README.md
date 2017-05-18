@@ -12,9 +12,9 @@ Features
 Elaborate reporting from the following categories are available:
 * **Financial Analysis -** Involves reports around sales, payment methods and shipping etc
 * **Product Analysis -** Insights of product purchase, abandoned cart etc
-* **Promotional analysis - **Reports of promotional costs etc are available.
-* **Search Analysis - **Search details reports.
-* **User Analysis - **Includes elaborate user analysis.
+* **Promotional analysis -** Reports of promotional costs etc are available.
+* **Search Analysis -** Search details reports.
+* **User Analysis -** Includes elaborate user analysis.
 
 **Other features include :**
 * Search and Filter
