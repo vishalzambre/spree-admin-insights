@@ -35,7 +35,7 @@ module Spree
 
 
     def report_query
-      Spree::Report::QueryFragments
+      wrap_with_arel_proxy Spree::Report::QueryFragments
         .from_subquery(tax_adjustments)
         .group(*time_scale_columns_to_s, 'zone_name')
         .order(*time_scale_columns)

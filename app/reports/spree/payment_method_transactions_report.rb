@@ -35,7 +35,7 @@ module Spree
     end
 
     def report_query
-      Spree::Report::QueryFragments
+      wrap_with_arel_proxy Spree::Report::QueryFragments
         .from_subquery(payments)
         .group(*time_scale_columns_to_s, 'payment_method_name')
         .order(*time_scale_columns)

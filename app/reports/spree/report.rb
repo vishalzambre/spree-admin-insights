@@ -9,6 +9,23 @@ module Spree
 
     TIME_SCALES = [:hourly, :daily, :monthly, :yearly]
 
+
+    class ArelWrapper < SimpleDelegator
+      def init(query_object)
+        super(query_object)
+        # @query_object = query_object
+      end
+
+
+      def to_sql
+        __getobj__.engine.nil? ? super : __getobj__.engine.to_s
+      end
+    end
+
+    def wrap_with_arel_proxy(query_object)
+      ArelWrapper.new(query_object)
+    end
+
     def paginated?
       false
     end
