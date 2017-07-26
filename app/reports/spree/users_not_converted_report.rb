@@ -33,7 +33,7 @@ module Spree
       Spree::User
         .where(created_at: reporting_period)
         .where(Spree::User.arel_table[:email].matches(email_search))
-        .left_joins(:spree_orders)
+        .joins("LEFT JOIN spree_orders on spree_orders.user_id = spree_users.id")
         .where(spree_orders: { completed_at: nil, number: nil })
         .select(
           "spree_users.email       as  user_email",
