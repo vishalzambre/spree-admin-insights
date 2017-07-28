@@ -14,13 +14,13 @@ class Spree::Report::TimedObservation < Spree::Report::Observation
   def describes?(result, time_scale)
     case time_scale
     when :hourly
-      result['hour'] == hour && result['day'] == day
+      result['hour'].to_i == hour && result['day'].to_i == day
     when :daily
-      result['day'] == day && result['month'] == month
+      result['day'].to_i == day && result['month'].to_i == month
     when :monthly
-      result['month'] == month && result['year'] == year
+      result['month'].to_i == month && result['year'].to_i == year
     when :yearly
-      result['year'] == year
+      result['year'].to_i == year
     end
   end
 
