@@ -63,7 +63,7 @@ module Spree
           'spree_orders.shipment_total  as shipping_charge',
           'spree_orders.id              as order_id',
           'spree_orders.total           as order_total',
-          *time_scale_selects('spree_orders')
+          *time_scale_selects_from_column('spree_orders', 'completed_at')
         )
     end
 

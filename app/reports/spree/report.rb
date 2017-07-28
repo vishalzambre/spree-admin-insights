@@ -93,6 +93,10 @@ module Spree
       QueryTimeScale.select(@time_scale, time_scale_on)
     end
 
+    def time_scale_selects_from_column(time_scale_on, column_name)
+      QueryTimeScale.select_with_column_name(@time_scale, time_scale_on, column_name)
+    end
+
     def time_scale_columns
       @_time_scale_columns ||= QueryTimeScale.time_scale_columns(@time_scale)
     end
