@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'spree', '~> 3.2'
-gem 'spree_events_tracker', '~> 3.2'
+branch = ENV.fetch('SOLIDUS_BRANCH', 'master')
+gem 'solidus', github: 'solidusio/solidus', branch: branch
+gem 'spree_events_tracker', github: 'vishalzambre/spree_events_tracker', branch: 'solidus_1.2.2'
 
 gemspec
