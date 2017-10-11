@@ -1,16 +1,5 @@
-<% if can? :admin, Spree::Admin::InsightsController %>
-  <ul class="nav nav-sidebar">
-    <li class="sidebar-menu-item">
-      <a data-toggle="collapse" data-parent="#sidebar" href="#sidebar-insights">
-        <span class="icon icon-stats"></span>
-        <span class="text"> <%= Spree.t(:tab_heading, scope: :insight) %></span>
-        <span class="icon icon-chevron-left pull-right"></span>
-      </a>
-      <ul data-hook="admin_configurations_sidebar_menu" class="collapse nav nav-pills nav-stacked" id="sidebar-insights">
-        <% Spree::ReportGenerationService.reports.each do |_key, _value| %>
-          <li class="sidebar-menu-item <%= (selected?(params[:report_category], _key) ? 'selected' : '') %>"><%= link_to Spree.t(_key), admin_insight_path(report_category: _key, id: _value.first)  %></li>
-        <% end %>
-      </ul>
-    </li>
-  </ul>
+<% if can? :admin, :reports %>
+  <%= tab :insights, label: Spree.t(:tab_heading, scope: :insight), icon: 'bar-chart' do %>
+    <%- render partial: 'spree/admin/shared/insights_sub_tabs' %>
+  <%end%>
 <% end %>

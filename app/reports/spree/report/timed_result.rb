@@ -13,21 +13,11 @@ module Spree
       end
 
       def populate_observations
-        observation_iter = @observations.each
-        current_observation = @observations.present? ? observation_iter.next : nil
         @results.each do |result|
-          if current_observation.present?
-            begin
-              until current_observation.describes? result, time_scale
-                current_observation = observation_iter.next
-              end
-
-              current_observation.populate(result)
-              current_observation = observation_iter.next
-            rescue StopIteration
-              break
-            end
+          current_observation = @observations.detect do |observation|
+            observation.describes?(result, time_scale)
           end
+          current_observation.populate(result) if current_observation
         end
       end
 

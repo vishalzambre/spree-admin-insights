@@ -48,7 +48,7 @@ module Spree
     private def all_orders_with_users
       Spree::User
         .where(Spree::User.arel_table[:email].matches(email_search))
-        .left_joins(:spree_orders)
+        .joins('LEFT JOIN spree_orders ON spree_orders.user_id = spree_users.id')
         .where(spree_orders: { completed_at: reporting_period })
         .order("spree_orders.completed_at desc")
         .select(

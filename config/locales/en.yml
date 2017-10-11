@@ -15,6 +15,7 @@ en:
       active_users: Active Users(Registered)
       guest_users: Guests
     insights: Insights
+    quick_search: Quick Search
     insight:
       heading: 'Insights: %{type}'
       tab_heading: Insights
